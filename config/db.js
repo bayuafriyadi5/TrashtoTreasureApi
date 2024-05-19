@@ -1,9 +1,13 @@
 const { Sequelize } = require('sequelize');
 const config = require('./config.json')['development'];
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-    host: config.host,
-    dialect: config.dialect,
+
+const sequelize = new Sequelize({
+    "username": "uyjhigauptnee1jk",
+    "password": "KdcwlywLFEukDTa5V2DN",
+    "database": "begnhhimrzdbwryxnjrr",
+    "host": "begnhhimrzdbwryxnjrr-mysql.services.clever-cloud.com",
+    "dialect": "mysql"
 });
 
 sequelize.authenticate()
