@@ -52,8 +52,15 @@ exports.createProduk = [
                 return response(400, null, "Penjual not found", res);
             }
 
-            const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk, id_penjual });
-            response(200, result, "Successfully insert data", res);
+            const result = await Produk.create({
+                nama_produk,
+                desc_produk,
+                harga_produk,
+                stok_produk,
+                foto_produk,
+                id_penjual
+            });
+            response(200, result, "Successfully inserted data", res);
         } catch (error) {
             response(500, error, "error", res);
         }
