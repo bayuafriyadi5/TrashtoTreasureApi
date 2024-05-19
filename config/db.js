@@ -1,6 +1,4 @@
 const { Sequelize } = require('sequelize');
-const config = require('./config.json')['development'];
-
 
 const sequelize = new Sequelize({
     "username": "uyjhigauptnee1jk",
