@@ -4,12 +4,13 @@ const path = require('path');
 // Configure storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Specify the directory to store images
+        cb(null, path.join(__dirname, '..', 'uploads')); // Use an absolute path
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Generate a unique filename
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
+
 
 // Filter to accept only images
 const fileFilter = (req, file, cb) => {
