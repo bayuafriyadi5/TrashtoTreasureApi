@@ -1,4 +1,5 @@
 const axios = require('axios');
+const crypto = require('crypto');
 const response = require('../utils/response');
 require('dotenv').config();
 
@@ -44,18 +45,24 @@ const getInvoice = async (invoiceID) => {
     }
 };
 
+function generateRandomInvoiceId() {
+    const randomString = crypto.randomBytes(4).toString('hex'); // Generates an 8-character hex string
+    return `invoice-${randomString}`;
+}
+
 exports.createInvoice = async (req, res) => {
     try {
-        console.log('Request Body:', req.body); // Log the request body
-        const { externalID, description, amount, currency, invoiceDuration, reminderTime } = req.body;
+        console.log('Request Body:', req.body);
+        const randomString = crypto.randomBytes(4).toString('hex');
+        const { amount } = req.body;
 
         const data = {
-            external_id: externalID,
-            description,
+            external_id: `invoice - ${randomString}`,
+            description: "Produk Daur Ulang",
             amount,
-            currency,
-            invoice_duration: invoiceDuration,
-            reminder_time: reminderTime,
+            currency: "IDR",
+            invoice_duration: 3600,
+            reminder_time: 1,
         };
 
         const createdInvoice = await createInvoice(data);
