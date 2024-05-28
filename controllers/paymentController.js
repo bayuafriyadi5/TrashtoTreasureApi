@@ -67,9 +67,10 @@ exports.createInvoice = async (req, res) => {
 
         const { id: invoice_id, invoice_url } = await createInvoice(data);
 
+        const { id_transaksi } = 3;
         await Transaksi.update(
             { invoice_id, invoice_url },
-            { where: { 3 } });
+            { where: { id_transaksi } });
 
         response(200, { invoice_id, invoice_url }, 'Successfully created invoice and update table transaksi', res);
     } catch (error) {
