@@ -1,4 +1,4 @@
-const { Transaksi, Penjual, Pembeli, Produk } = require('../models'); // Import from db object
+const { Sequelize, sequelize, Transaksi, Penjual, Pembeli, Produk } = require('../models'); // Import from db object
 const response = require('../utils/response');
 
 exports.getTransaksi = async (req, res) => {
