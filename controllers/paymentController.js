@@ -71,7 +71,7 @@ exports.createInvoice = async (req, res) => {
             { invoice_id, invoice_url },
             { where: { 3 } });
 
-        response(200, { invoice_id, invoice_url }, 'Successfully created invoice and update table', res);
+        response(200, { invoice_id, invoice_url }, 'Successfully created invoice and update table transaksi', res);
     } catch (error) {
         console.error('Error creating invoice:', error.message);
         response(500, { error: error.message }, 'Error creating invoice', res);
