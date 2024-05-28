@@ -7,6 +7,7 @@ const produkRoutes = require('./routes/produkRoutes');
 const transaksiRoutes = require('./routes/transaksiRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const pembayaranRoutes = require('./routes/pembayaranRoutes');
 
 const port = 3000;
 
@@ -19,6 +20,7 @@ app.use('/produk', produkRoutes);
 app.use('/transaksi', transaksiRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/webhook', webhookRoutes);
+app.use('/pembayaran', pembayaranRoutes);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
