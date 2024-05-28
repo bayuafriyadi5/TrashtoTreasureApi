@@ -1,5 +1,7 @@
 const axios = require('axios');
 const crypto = require('crypto');
+const { Transaksi } = require('../models'); // Import Transaksi model
+
 const response = require('../utils/response');
 require('dotenv').config();
 
@@ -21,7 +23,9 @@ const createInvoice = async (data) => {
 
     try {
         const res = await axios.post(XENDIT_API_URL, data, config);
-        return res.data;
+        const { id, invoice_url } = res.data; // Extract invoice_id and invoice_url from the response
+        return { id, invoice_url };
+
     } catch (error) {
         console.error('Error in createInvoice:', error.response ? error.response.data : error.message);
         throw new Error(error.response ? error.response.data.message : error.message);
@@ -61,9 +65,13 @@ exports.createInvoice = async (req, res) => {
             reminder_time: 1,
         };
 
-        const createdInvoice = await createInvoice(data);
+        const { id: invoice_id, invoice_url } = await createInvoice(data);
 
-        response(200, createdInvoice, 'Successfully created invoice', res);
+        await Transaksi.update(
+            { invoice_id, invoice_url },
+            { where: { 3 } });
+
+        response(200, { invoice_id, invoice_url }, 'Successfully created invoice and update table', res);
     } catch (error) {
         console.error('Error creating invoice:', error.message);
         response(500, { error: error.message }, 'Error creating invoice', res);
