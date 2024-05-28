@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-const { Transaksi, Produk } = require('../models'); // Include Produk model
+const { Transaksi, Produk, Pembayaran } = require('../models'); // Include Pembayaran model
 const XENDIT_API_URL = 'https://api.xendit.co/v2/invoices';
 const XENDIT_API_KEY = process.env.XENDIT_API_KEY;
 
@@ -11,6 +11,14 @@ const updateTransactionStatus = async (transaction, status) => {
     if (transaction.status === 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
         // Update the transaction status based on the payment status
         await transaction.update({ status: 'paid' });
+
+        // Insert a new Pembayaran record
+        await Pembayaran.create({
+            waktu_pemabayaran: new Date().toISOString(),
+            total_bayar: transaction.total_harga,
+            metode_pembayaran: 1, // Assuming a default value for metode_pembayaran
+            id_transaksi: transaction.id_transaksi
+        });
     }
 };
 

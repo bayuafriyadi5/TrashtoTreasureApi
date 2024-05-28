@@ -5,12 +5,14 @@ const Penjual = require('./penjual')(sequelize, Sequelize);
 const Pembeli = require('./pembeli')(sequelize, Sequelize);
 const Produk = require('./produk')(sequelize, Sequelize);
 const Transaksi = require('./transaksi')(sequelize, Sequelize);
+const Pembayaran = require('./pembayaran')(sequelize, Sequelize);
 
 
 // Initialize associations
 Produk.associate({ Penjual, Pembeli, Produk });
 Penjual.associate({ Penjual, Pembeli, Produk });
 Transaksi.associate({ Penjual, Pembeli, Produk });
+Pembayaran.associate({ Penjual, Pembeli, Produk, Transaksi });
 
 
 const models = {
@@ -18,6 +20,7 @@ const models = {
     Pembeli,
     Produk,
     Transaksi,
+    Pembayaran,
 };
 
 const db = {
