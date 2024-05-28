@@ -11,11 +11,12 @@ console.log('Xendit Secret Key:', XENDIT_API_KEY);
 const updateTransactionStatus = async (transaction, status) => {
     if (transaction.status === 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
         // Update the transaction status based on the payment status
-        await transaction.update({ status: 'pending' });
-    } else if (transaction.status !== 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
-        // Update the transaction status to "paid" if it's not "unpaid" and has a non-empty invoice ID
         await transaction.update({ status: 'paid' });
     }
+    // else if (transaction.status !== 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
+    //     // Update the transaction status to "paid" if it's not "unpaid" and has a non-empty invoice ID
+    //     await transaction.update({ status: 'paid' });
+    // }
 };
 
 const getInvoiceStatus = async (invoiceID) => {
