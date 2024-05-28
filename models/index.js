@@ -11,7 +11,7 @@ const Transaksi = require('./transaksi')(sequelize, Sequelize);
 Produk.associate({ Penjual, Pembeli, Produk });
 Penjual.associate({ Penjual, Pembeli, Produk });
 Transaksi.associate({ Penjual, Pembeli, Produk });
-TransaksiProduk.associate({ Produk, Transaksi });
+
 
 const models = {
     Penjual,
