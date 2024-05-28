@@ -35,7 +35,7 @@ exports.getTransaksiById = async (req, res) => {
 };
 
 exports.createTransaksi = async (req, res) => {
-    const t = await Sequelize.transaction();
+    const t = await sequelize.transaction();
     try {
         const { id_pembeli, total_harga, id_penjual, id_produk, qty } = req.body;
 
