@@ -5,7 +5,7 @@ const Penjual = require('./penjual')(sequelize, Sequelize);
 const Pembeli = require('./pembeli')(sequelize, Sequelize);
 const Produk = require('./produk')(sequelize, Sequelize);
 const Transaksi = require('./transaksi')(sequelize, Sequelize);
-const TransaksiProduk = require('./transaksiProduk')(sequelize, Sequelize);
+
 
 // Initialize associations
 Produk.associate({ Penjual, Pembeli, Produk });
@@ -18,7 +18,6 @@ const models = {
     Pembeli,
     Produk,
     Transaksi,
-    TransaksiProduk,
 };
 
 const db = {

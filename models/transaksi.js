@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         status: {
             type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 'unpaid', // Set default value
+            defaultValue: 'unpaid',
         },
         id_pembeli: {
             type: DataTypes.INTEGER,
@@ -42,9 +42,9 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         tableName: 'transaksi',
-        timestamps: true, // Enable timestamps
-        createdAt: 'created_at', // Map createdAt to created_at
-        updatedAt: 'updated_at', // Map updatedAt to updated_at
+        timestamps: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
     });
 
     Transaksi.associate = models => {
