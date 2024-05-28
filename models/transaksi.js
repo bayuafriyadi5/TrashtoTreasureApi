@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         status: {
             type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 'belum bayar', // Set default value
+            defaultValue: 'unpaid', // Set default value
         },
         id_pembeli: {
             type: DataTypes.INTEGER,
