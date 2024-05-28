@@ -1,46 +1,31 @@
 const express = require('express');
 const router = express.Router();
 
-// Webhook handler for Xendit invoices
-router.post('/webhooks/xendit/invoices', async (req, res) => {
+router.post('/webhook/xendit/invoice/status', async (req, res) => {
     try {
-        console.log('Received webhook from Xendit:', req.body);
+        const { id, status } = req.body;
 
-        const eventType = req.body.event;
-        const invoice = req.body.data;
+        const customerOrder = await CustomerOrder.findOne({ where: { invoice_id: id } });
 
-        switch (eventType) {
-            case 'invoice.paid':
-                // Handle paid invoice
-                await handlePaidInvoice(invoice);
-                break;
-            case 'invoice.expired':
-                // Handle expired invoice
-                await handleExpiredInvoice(invoice);
-                break;
-            // Add more cases as needed for other invoice-related events
-            default:
-                console.log(`Unhandled event type: ${eventType}`);
+        if (!customerOrder) {
+            return res.status(404).json({ status: 404, message: "Invoice not found" });
         }
 
-        // Responding to Xendit immediately after receiving the webhook
-        res.status(200).send({ message: 'Webhook received successfully' });
+        if (customerOrder.status === "unpaid" && status === "PAID") {
+            // Update the status to "pending" if the invoice was unpaid and now is paid
+            await customerOrder.update({ status: "pending" });
+        } else {
+            // Return error response if the invoice has been paid already
+            return res.status(403).json({ status: 403, message: "Invoice has been paid" });
+        }
+
+        // Return success response
+        return res.status(200).json({ status: 200, data: req.body });
     } catch (error) {
-        console.error('Error processing webhook:', error);
-        res.status(500).send({ error: 'Failed to process webhook' });
+        // Handle any errors and return an error response
+        console.error("Error handling webhook invoice status:", error);
+        return res.status(500).json({ status: 500, message: "Internal server error" });
     }
 });
-
-async function handlePaidInvoice(invoice) {
-    // Logic to handle a paid invoice
-    console.log('Handling paid invoice:', invoice);
-    // Implement your logic here, like updating database records, notifying users, etc.
-}
-
-async function handleExpiredInvoice(invoice) {
-    // Logic to handle an expired invoice
-    console.log('Handling expired invoice:', invoice);
-    // Implement your logic here
-}
 
 module.exports = router;
