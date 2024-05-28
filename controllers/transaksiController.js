@@ -1,4 +1,4 @@
-const { Sequelize, sequelize, Transaksi, Penjual, Pembeli, Produk } = require('../models'); // Import from db object
+const { Transaksi, Penjual, Pembeli, Produk } = require('../models'); // Import from db object
 const response = require('../utils/response');
 
 exports.getTransaksi = async (req, res) => {
@@ -35,37 +35,28 @@ exports.getTransaksiById = async (req, res) => {
 };
 
 exports.createTransaksi = async (req, res) => {
-    const t = await sequelize.transaction();
     try {
         const { id_pembeli, total_harga, id_penjual, id_produk, qty } = req.body;
 
-        // Fetch the product to check stock
-        const produk = await Produk.findByPk(id_produk, { transaction: t });
+        // Fetch the associated Produk record
+        const produk = await Produk.findOne({ where: { id_produk } });
+
         if (!produk) {
-            await t.rollback();
-            return response(404, null, "Produk not found", res);
+            return response(404, { error: "Produk not found" }, "Error creating data", res);
         }
 
-        // Check if there is enough stock
         if (produk.stok_produk < qty) {
-            await t.rollback();
-            return response(400, null, "Not enough stock", res);
+            return response(400, { error: "Insufficient stock" }, "Error creating data", res);
         }
 
-        // Decrease the stock
+        // Decrease the stok_produk
         produk.stok_produk -= qty;
-        await produk.save({ transaction: t });
+        await produk.save();
 
-        // Create the transaction
-        const result = await Transaksi.create(
-            { id_pembeli, total_harga, id_penjual, id_produk, qty },
-            { transaction: t }
-        );
-
-        await t.commit();
+        // Create the Transaksi record
+        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, id_produk, qty });
         response(200, result, "Successfully inserted data", res);
     } catch (error) {
-        await t.rollback();
         response(500, { error: error.message }, "Error creating data", res);
     }
 };
