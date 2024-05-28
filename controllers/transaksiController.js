@@ -64,13 +64,28 @@ exports.updateTransaksi = async (req, res) => {
 exports.deleteTransaksi = async (req, res) => {
     try {
         const { id_transaksi } = req.body;
-        const result = await Transaksi.destroy({ where: { id_transaksi } });
-        if (result) {
-            response(200, { isDeleted: result }, "Successfully deleted data", res);
-        } else {
-            response(404, "Transaksi not found", "Error", res);
+        const transaksi = await Transaksi.findOne({ where: { id_transaksi } });
+
+        if (!transaksi) {
+            return response(404, "Transaksi not found", "Error", res);
         }
+
+        // Check for related Produk records
+        const produk = await Produk.findOne({ where: { id_produk: transaksi.id_produk } });
+
+        if (produk) {
+            // Handle the related Produk record as needed (e.g., delete, update, etc.)
+            // Example: set the foreign key to null
+            await Produk.update({ id_produk: null }, { where: { id_produk: produk.id_produk } });
+        }
+
+        // Now, delete the Transaksi record
+        await transaksi.destroy();
+
+        response(200, { isDeleted: true }, "Successfully deleted data", res);
     } catch (error) {
+        console.error("Error deleting data:", error);
         response(500, { error: error.message }, "Error deleting data", res);
     }
 };
+
