@@ -13,10 +13,26 @@ const updateTransactionStatus = async (transaction, status) => {
         // Update the transaction status based on the payment status
         await transaction.update({ status: 'paid' });
     }
-    // else if (transaction.status !== 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
-    //     // Update the transaction status to "paid" if it's not "unpaid" and has a non-empty invoice ID
-    //     await transaction.update({ status: 'paid' });
-    // }
+};
+
+const createInvoice = async (data) => {
+    const config = {
+        auth: {
+            username: XENDIT_API_KEY,
+            password: '',
+        },
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    try {
+        const res = await axios.post(XENDIT_API_URL, data, config);
+        return res.data;
+    } catch (error) {
+        console.error('Error in createInvoice:', error.response ? error.response.data : error.message);
+        throw new Error(error.response ? error.response.data.message : error.message);
+    }
 };
 
 const getInvoiceStatus = async (invoiceID) => {
@@ -49,6 +65,20 @@ router.post('/xendit/invoice/status', async (req, res) => {
                 const invoiceStatus = await getInvoiceStatus(transaction.invoice_id);
                 if (invoiceStatus === 'SETTLED') {
                     await updateTransactionStatus(transaction, 'paid');
+                } else if (invoiceStatus === 'EXPIRED') {
+                    // Create a new invoice
+                    const randomString = crypto.randomBytes(4).toString('hex');
+                    const newInvoiceData = {
+                        external_id: `invoice - ${randomString}`,
+                        description: 'Produk Daur Ulang',
+                        amount: transaction.total_harga,
+                        currency: 'IDR',
+                        invoice_duration: 360,
+                        reminder_time: 1,
+                    };
+                    const newInvoice = await createInvoice(newInvoiceData);
+                    // Update the transaction with the new invoice ID and URL
+                    await transaction.update({ invoice_id: newInvoice.id, invoice_url: newInvoice.invoice_url });
                 }
             }
         }
