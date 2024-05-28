@@ -4,33 +4,27 @@ const { Transaksi } = require('../models');
 
 router.post('/xendit/invoice/status', async (req, res) => {
     try {
-        const { invoice_id, status } = req.body;
+        // Fetch all transactions from the Transaksi table
+        const transactions = await Transaksi.findAll();
 
-        // Check if the id and status are provided in the request
-        if (!invoice_id || !status) {
-            return res.status(400).json({ status: 400, message: "Missing invoice id or status" });
+        // Check if there are any transactions
+        if (!transactions || transactions.length === 0) {
+            return res.status(404).json({ status: 404, message: "No transactions found" });
         }
 
-        // Find the transaction with the given invoice_id
-        const transaksi = await Transaksi.findOne({ where: { invoice_id: invoice_id } });
-        console.log(invoice_id)
-
-        // Check if the transaction exists
-        if (!transaksi) {
-            return res.status(404).json({ status: 404, message: "Invoice not found" });
-        }
-
-        // Update the transaction status based on the payment status
-        if (transaksi.status === "unpaid" && status === "PAID") {
-            await transaksi.update({ status: "pending" });
-        } else if (transaksi.status !== "unpaid") {
-            return res.status(403).json({ status: 403, message: "Invoice has already been processed" });
-        } else {
-            return res.status(400).json({ status: 400, message: "Invalid status transition" });
+        // Iterate through each transaction and update its status based on conditions
+        for (const transaction of transactions) {
+            if (transaction.status === "unpaid" && transaction.invoice_id && transaction.invoice_id !== '') {
+                // Update the transaction status based on the payment status
+                await transaction.update({ status: "pending" });
+            } else if (transaction.status !== "unpaid" && transaction.invoice_id && transaction.invoice_id !== '') {
+                // Update the transaction status to "paid" if it's not "unpaid" and has a non-empty invoice ID
+                await transaction.update({ status: "paid" });
+            }
         }
 
         // Return success response
-        return res.status(200).json({ status: 200, data: req.body });
+        return res.status(200).json({ status: 200, message: "Transaction statuses updated successfully" });
     } catch (error) {
         // Handle any errors and return an error response
         console.error("Error handling webhook invoice status:", error);
