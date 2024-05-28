@@ -13,6 +13,7 @@ router.post('/xendit/invoice/status', async (req, res) => {
 
         // Find the transaction with the given invoice_id
         const transaksi = await Transaksi.findOne({ where: { invoice_id: invoice_id } });
+        console.log(invoice_id)
 
         // Check if the transaction exists
         if (!transaksi) {
