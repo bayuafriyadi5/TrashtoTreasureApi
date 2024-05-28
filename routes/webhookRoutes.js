@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/webhook/xendit/invoice/status', async (req, res) => {
+router.post('/xendit/invoice/status', async (req, res) => {
     try {
         const { id, status } = req.body;
 
