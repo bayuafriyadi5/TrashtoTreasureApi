@@ -35,11 +35,37 @@ exports.getTransaksiById = async (req, res) => {
 };
 
 exports.createTransaksi = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { id_pembeli, total_harga, id_penjual, id_produk, qty } = req.body;
-        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, id_produk, qty });
+
+        // Fetch the product to check stock
+        const produk = await Produk.findByPk(id_produk, { transaction: t });
+        if (!produk) {
+            await t.rollback();
+            return response(404, null, "Produk not found", res);
+        }
+
+        // Check if there is enough stock
+        if (produk.stok_produk < qty) {
+            await t.rollback();
+            return response(400, null, "Not enough stock", res);
+        }
+
+        // Decrease the stock
+        produk.stok_produk -= qty;
+        await produk.save({ transaction: t });
+
+        // Create the transaction
+        const result = await Transaksi.create(
+            { id_pembeli, total_harga, id_penjual, id_produk, qty },
+            { transaction: t }
+        );
+
+        await t.commit();
         response(200, result, "Successfully inserted data", res);
     } catch (error) {
+        await t.rollback();
         response(500, { error: error.message }, "Error creating data", res);
     }
 };
@@ -88,4 +114,3 @@ exports.deleteTransaksi = async (req, res) => {
         response(500, { error: error.message }, "Error deleting data", res);
     }
 };
-
