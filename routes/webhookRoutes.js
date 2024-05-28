@@ -1,8 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-const { Transaksi } = require('../models');
-
+const { Transaksi, Produk } = require('../models'); // Include Produk model
 const XENDIT_API_URL = 'https://api.xendit.co/v2/invoices';
 const XENDIT_API_KEY = process.env.XENDIT_API_KEY;
 
@@ -46,7 +45,16 @@ router.post('/xendit/invoice/status', async (req, res) => {
                 if (invoiceStatus === 'SETTLED') {
                     await updateTransactionStatus(transaction, 'paid');
                 } else if (invoiceStatus === 'EXPIRED') {
-                    // Delete the transaction if the invoice is expired
+                    // Handle the expired invoice case
+                    const produk = await Produk.findOne({ where: { id_produk: transaction.id_produk } });
+
+                    if (produk) {
+                        // Increase the stok_produk by the qty from the transaction
+                        produk.stok_produk += transaction.qty;
+                        await produk.save();
+                    }
+
+                    // Delete the transaction
                     await transaction.destroy();
                 }
             }
