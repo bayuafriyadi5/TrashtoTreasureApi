@@ -1,4 +1,4 @@
-const { Transaksi, Penjual, Pembeli } = require('../models'); // Import from db object
+const { Transaksi, Penjual, Pembeli, Produk } = require('../models'); // Import from db object
 const response = require('../utils/response');
 
 exports.getTransaksi = async (req, res) => {
@@ -6,7 +6,8 @@ exports.getTransaksi = async (req, res) => {
         const result = await Transaksi.findAll({
             include: [
                 { model: Penjual, as: 'penjual' },
-                { model: Pembeli, as: 'pembeli' }
+                { model: Pembeli, as: 'pembeli' },
+                { model: Produk, as: 'produk' }
             ],
             logging: console.log
         });
@@ -23,7 +24,8 @@ exports.getTransaksiById = async (req, res) => {
         const result = await Transaksi.findByPk(id_transaksi, {
             include: [
                 { model: Penjual, as: 'penjual' },
-                { model: Pembeli, as: 'pembeli' }
+                { model: Pembeli, as: 'pembeli' },
+                { model: Produk, as: 'produk' }
             ]
         });
         response(200, result, "Search transaksi by id", res);
