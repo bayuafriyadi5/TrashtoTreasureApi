@@ -7,22 +7,22 @@ const XENDIT_API_KEY = process.env.XENDIT_API_KEY;
 
 console.log('Xendit Secret Key:', XENDIT_API_KEY);
 
-const updateTransactionStatus = async (transaction, status) => {
+const updateTransactionStatus = async (transaction, invoiceData) => {
     if (transaction.status === 'unpaid' && transaction.invoice_id && transaction.invoice_id !== '') {
         // Update the transaction status based on the payment status
         await transaction.update({ status: 'paid' });
 
         // Insert a new Pembayaran record
         await Pembayaran.create({
-            waktu_pemabayaran: new Date().toISOString(),
-            total_bayar: transaction.total_harga,
-            metode_pembayaran: 1, // Assuming a default value for metode_pembayaran
+            waktu_pemabayaran: invoiceData.updated,
+            total_bayar: invoiceData.amount,
+            metode_pembayaran: invoiceData.payment_method, // Assuming this field exists in the invoice data
             id_transaksi: transaction.id_transaksi
         });
     }
 };
 
-const getInvoiceStatus = async (invoiceID) => {
+const getInvoiceData = async (invoiceID) => {
     const config = {
         auth: {
             username: XENDIT_API_KEY,
@@ -32,9 +32,9 @@ const getInvoiceStatus = async (invoiceID) => {
 
     try {
         const res = await axios.get(`${XENDIT_API_URL}/${invoiceID}`, config);
-        return res.data.status;
+        return res.data;
     } catch (error) {
-        console.error('Error in getInvoiceStatus:', error.response ? error.response.data : error.message);
+        console.error('Error in getInvoiceData:', error.response ? error.response.data : error.message);
         throw new Error(error.response ? error.response.data.message : error.message);
     }
 };
@@ -49,10 +49,10 @@ router.post('/xendit/invoice/status', async (req, res) => {
 
         for (const transaction of transactions) {
             if (transaction.invoice_id && transaction.invoice_id !== '') {
-                const invoiceStatus = await getInvoiceStatus(transaction.invoice_id);
-                if (invoiceStatus === 'SETTLED') {
-                    await updateTransactionStatus(transaction, 'paid');
-                } else if (invoiceStatus === 'EXPIRED') {
+                const invoiceData = await getInvoiceData(transaction.invoice_id);
+                if (invoiceData.status === 'SETTLED') {
+                    await updateTransactionStatus(transaction, invoiceData);
+                } else if (invoiceData.status === 'EXPIRED') {
                     // Handle the expired invoice case
                     const produk = await Produk.findOne({ where: { id_produk: transaction.id_produk } });
 
