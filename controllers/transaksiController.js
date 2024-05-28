@@ -34,8 +34,8 @@ exports.getTransaksiById = async (req, res) => {
 
 exports.createTransaksi = async (req, res) => {
     try {
-        const { id_pembeli, total_harga, id_penjual, qty, invoice_id, invoice_url } = req.body;
-        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, qty, invoice_id, invoice_url });
+        const { id_pembeli, total_harga, id_penjual, qty } = req.body;
+        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, qty });
         response(200, result, "Successfully inserted data", res);
     } catch (error) {
         response(500, { error: error.message }, "Error creating data", res);

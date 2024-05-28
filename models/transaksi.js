@@ -29,10 +29,12 @@ module.exports = (sequelize, DataTypes) => {
         invoice_id: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue: 'xxx',
         },
         invoice_url: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue: 'xxx',
         },
     }, {
         tableName: 'transaksi',
