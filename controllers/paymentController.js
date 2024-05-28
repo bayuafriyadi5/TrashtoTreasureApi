@@ -57,7 +57,7 @@ exports.createInvoice = async (req, res) => {
             description: "Produk Daur Ulang",
             amount,
             currency: "IDR",
-            invoice_duration: 3600,
+            invoice_duration: 360,
             reminder_time: 1,
         };
 
