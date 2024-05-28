@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             defaultValue: 'xxx',
         },
+        id_produk: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
     }, {
         tableName: 'transaksi',
         timestamps: true, // Enable timestamps
@@ -46,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     Transaksi.associate = models => {
         Transaksi.belongsTo(models.Penjual, { foreignKey: 'id_penjual', as: 'penjual' });
         Transaksi.belongsTo(models.Pembeli, { foreignKey: 'id_pembeli', as: 'pembeli' });
+        Transaksi.belongsTo(models.Produk, { foreignKey: 'id_produk', as: 'produk' });
     };
 
     return Transaksi;
