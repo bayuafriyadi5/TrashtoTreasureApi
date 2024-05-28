@@ -12,15 +12,25 @@ const updateTransactionStatus = async (transaction, invoiceData) => {
         // Update the transaction status based on the payment status
         await transaction.update({ status: 'paid' });
 
-        // Insert a new Pembayaran record
-        await Pembayaran.create({
-            waktu_pemabayaran: invoiceData.paid_at,
-            total_bayar: invoiceData.amount,
-            metode_pembayaran: invoiceData.payment_method, // Assuming this field exists in the invoice data
-            id_transaksi: transaction.id_transaksi
-        });
+        // Log the invoice data
+        console.log('Invoice Data:', invoiceData);
+
+        // Check if invoiceData has a valid paid_at field
+        if (invoiceData && invoiceData.paid_at) {
+            // Insert a new Pembayaran record
+            await Pembayaran.create({
+                waktu_pembayaran: invoiceData.paid_at,
+                total_bayar: invoiceData.amount,
+                metode_pembayaran: invoiceData.payment_method, // Assuming this field exists in the invoice data
+                id_transaksi: transaction.id_transaksi
+            });
+        } else {
+            console.error('Error: paid_at field is missing or null in invoiceData');
+            // Handle the error accordingly, such as logging or returning an error response
+        }
     }
 };
+
 
 const getInvoiceData = async (invoiceID) => {
     const config = {
