@@ -14,7 +14,7 @@ const updateTransactionStatus = async (transaction, invoiceData) => {
 
         // Insert a new Pembayaran record
         await Pembayaran.create({
-            waktu_pemabayaran: invoiceData.updated,
+            waktu_pemabayaran: invoiceData.paid_at,
             total_bayar: invoiceData.amount,
             metode_pembayaran: invoiceData.payment_method, // Assuming this field exists in the invoice data
             id_transaksi: transaction.id_transaksi

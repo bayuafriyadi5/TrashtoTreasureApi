@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
         },
         waktu_pembayaran: {
-            type: DataTypes.STRING,
+            type: DataTypes.DATE,
             allowNull: false,
         },
         total_bayar: {
