@@ -6,8 +6,7 @@ exports.getAllPembayaran = async (req, res) => {
         const result = await Pembayaran.findAll({
             include: [
                 { model: Transaksi, as: 'transaksi' },
-                { model: Penjual, as: 'penjual' },
-                { model: Produk, as: 'produk' }
+
             ],
             logging: console.log
         });
@@ -24,8 +23,7 @@ exports.getPembayaranById = async (req, res) => {
         const result = await Pembayaran.findByPk(id_pembayaran, {
             include: [
                 { model: Transaksi, as: 'transaksi' },
-                { model: Penjual, as: 'penjual' },
-                { model: Produk, as: 'produk' }
+
             ]
         });
         response(200, result, "Search transaksi by id", res);
