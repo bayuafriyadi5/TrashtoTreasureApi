@@ -1,19 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const { Transaksi } = require('../models');
 
 router.post('/xendit/invoice/status', async (req, res) => {
     try {
         const { id, status } = req.body;
 
-        const customerOrder = await CustomerOrder.findOne({ where: { invoice_id: id } });
+        const transaksi = await Transaksi.findOne({ where: { invoice_id: id } });
 
-        if (!customerOrder) {
+        if (!transaksi) {
             return res.status(404).json({ status: 404, message: "Invoice not found" });
         }
 
-        if (customerOrder.status === "unpaid" && status === "PAID") {
+        if (transaksi.status === "unpaid" && status === "PAID") {
             // Update the status to "pending" if the invoice was unpaid and now is paid
-            await customerOrder.update({ status: "pending" });
+            await transaksi.update({ status: "pending" });
         } else {
             // Return error response if the invoice has been paid already
             return res.status(403).json({ status: 403, message: "Invoice has been paid" });
