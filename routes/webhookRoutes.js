@@ -4,15 +4,15 @@ const { Transaksi } = require('../models');
 
 router.post('/xendit/invoice/status', async (req, res) => {
     try {
-        const { id, status } = req.body;
+        const { invoice_id, status } = req.body;
 
         // Check if the id and status are provided in the request
-        if (!id || !status) {
+        if (!invoice_id || !status) {
             return res.status(400).json({ status: 400, message: "Missing invoice id or status" });
         }
 
         // Find the transaction with the given invoice_id
-        const transaksi = await Transaksi.findOne({ where: { invoice_id: id } });
+        const transaksi = await Transaksi.findOne({ where: { invoice_id: invoice_id } });
 
         // Check if the transaction exists
         if (!transaksi) {
