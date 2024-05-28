@@ -36,7 +36,7 @@ exports.getTransaksiById = async (req, res) => {
 
 exports.createTransaksi = async (req, res) => {
     try {
-        const { id_pembeli, total_harga, id_penjual, id_produk, qty } = req.body;
+        const { id_pembeli, total_harga, id_penjual, id_produk, qty, invoice_id, invoice_url } = req.body;
 
         // Fetch the associated Produk record
         const produk = await Produk.findOne({ where: { id_produk } });
@@ -54,7 +54,7 @@ exports.createTransaksi = async (req, res) => {
         await produk.save();
 
         // Create the Transaksi record
-        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, id_produk, qty });
+        const result = await Transaksi.create({ id_pembeli, total_harga, id_penjual, id_produk, qty, invoice_id, invoice_url });
         response(200, result, "Successfully inserted data", res);
     } catch (error) {
         response(500, { error: error.message }, "Error creating data", res);
