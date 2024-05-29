@@ -5,7 +5,7 @@ const authenticateToken = require('../middleware/auth');
 
 router.get('/', pembeliController.getAllPembeli);
 router.get('/find', pembeliController.findPembeliByName);
-router.get('/:id_pembeli', authenticateToken, pembeliController.getPembeliById);
+router.get('/getuser', authenticateToken, pembeliController.getPembeliById);
 router.post('/register', pembeliController.registerPembeli);
 router.post('/login', pembeliController.loginPembeli);
 router.put('/', authenticateToken, pembeliController.updatePembeli);
