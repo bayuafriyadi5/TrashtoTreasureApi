@@ -101,7 +101,18 @@ exports.updatePembeli = async (req, res) => {
     try {
         const pembeli = req.pembeli;
         const { nama, email, telepon, alamat, password } = req.body;
-        const result = await Pembeli.update({ nama, email, telepon, alamat, password }, { where: { id_pembeli: pembeli.id_pembeli } });
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await Pembeli.update({
+            nama,
+            email,
+            telepon,
+            alamat,
+            password: hashedPassword // Use the hashed password
+        }, { where: { id_pembeli: pembeli.id_pembeli } });
+
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully update data", res);
         } else {
