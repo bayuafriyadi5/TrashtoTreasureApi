@@ -58,9 +58,9 @@ exports.createProduk = [
     async (req, res) => {
         try {
 
-            if (!req.penjual) {
-                return response(403, null, "Unauthorized: Only sellers can add products", res);
-            }
+            // if (!req.penjual) {
+            //     return response(403, null, "Unauthorized: Only sellers can add products", res);
+            // }
 
             const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
