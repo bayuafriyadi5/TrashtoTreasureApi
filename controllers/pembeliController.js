@@ -101,8 +101,8 @@ exports.findPembeliByName = async (req, res) => {
 exports.updatePembeli = async (req, res) => {
     try {
         const pembeli = req.pembeli;
-        const { nama, email, telepon, alamat } = req.body;
-        const result = await Pembeli.update({ nama, email, telepon, alamat }, { where: { id_pembeli: pembeli.id_pembeli } });
+        const { nama, email, telepon, alamat, password } = req.body;
+        const result = await Pembeli.update({ nama, email, telepon, alamat, password }, { where: { id_pembeli: pembeli.id_pembeli } });
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully update data", res);
         } else {
