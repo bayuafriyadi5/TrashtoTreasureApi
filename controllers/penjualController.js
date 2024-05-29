@@ -18,7 +18,8 @@ exports.registerAsPenjual = async (req, res) => {
             nama: pembeli.nama,
             email: pembeli.email,
             telepon: pembeli.telepon,
-            no_rekening
+            no_rekening,
+            token: pembeli.token
         });
 
         response(201, penjual, "Successfully registered as Penjual", res);

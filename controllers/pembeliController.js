@@ -1,4 +1,4 @@
-const { Pembeli } = require('../models');
+const { Pembeli, Penjual } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const response = require('../utils/response');
@@ -35,6 +35,11 @@ exports.loginPembeli = async (req, res) => {
             return response(404, null, "User not found", res);
         }
 
+        const penjual = await Penjual.findOne({ where: { email } });
+        if (!penjual) {
+            return response(404, null, "User not found", res);
+        }
+
         // Check password
         const isPasswordValid = await bcrypt.compare(password, pembeli.password);
         if (!isPasswordValid) {
@@ -46,7 +51,9 @@ exports.loginPembeli = async (req, res) => {
 
         // Update user token in the database
         pembeli.token = token;
+        penjual.token = token;
         await pembeli.save();
+        await penjual.save();
 
         response(200, { token }, "Login successful", res);
     } catch (error) {
