@@ -58,6 +58,7 @@ exports.createProduk = [
     async (req, res) => {
         try {
 
+            console.log(req.penjual.id_penjual)
             // if (!req.penjual) {
             //     return response(403, null, "Unauthorized: Only sellers can add products", res);
             // }
