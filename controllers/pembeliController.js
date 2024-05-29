@@ -5,7 +5,7 @@ const response = require('../utils/response');
 
 exports.registerPembeli = async (req, res) => {
     try {
-        const { nama, email, telepon, alamat, password } = req.body;
+        const { nama, email, telepon, password } = req.body;
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -15,7 +15,6 @@ exports.registerPembeli = async (req, res) => {
             nama,
             email,
             telepon,
-            alamat,
             password: hashedPassword
         });
 
