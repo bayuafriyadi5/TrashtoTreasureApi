@@ -79,7 +79,7 @@ exports.getPembeliById = async (req, res) => {
             return response(401, null, "Unauthorized: No authenticated user", res);
         }
 
-        const result = await Pembeli.findByPk(pembeli.token);
+        const result = await Pembeli.findOne(pembeli.token);
         response(200, result, "Retrieved pembeli data based on auth token", res);
     } catch (error) {
         response(500, error, "Error retrieving pembeli data", res);
