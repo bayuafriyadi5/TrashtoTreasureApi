@@ -75,13 +75,18 @@ exports.getAllPembeli = async (req, res) => {
 
 exports.getPembeliById = async (req, res) => {
     try {
-        const id_pembeli = req.params.id_pembeli;
-        const result = await Pembeli.findByPk(id_pembeli);
-        response(200, result, "search pembeli id", res);
+        const pembeli = req.pembeli;
+        if (!pembeli) {
+            return response(401, null, "Unauthorized: No authenticated user", res);
+        }
+
+        const result = await Pembeli.findByPk(pembeli.id_pembeli);
+        response(200, result, "Retrieved pembeli data based on auth token", res);
     } catch (error) {
-        response(500, error, "error", res);
+        response(500, error, "Error retrieving pembeli data", res);
     }
 };
+
 
 exports.findPembeliByName = async (req, res) => {
     try {
