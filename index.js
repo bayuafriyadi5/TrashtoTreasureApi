@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -8,6 +10,7 @@ const transaksiRoutes = require('./routes/transaksiRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const pembayaranRoutes = require('./routes/pembayaranRoutes');
+const protectedRoutes = require('./routes/protectedRoutes');
 
 const port = 3000;
 
@@ -21,6 +24,7 @@ app.use('/transaksi', transaksiRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/webhook', webhookRoutes);
 app.use('/pembayaran', pembayaranRoutes);
+app.use('/protected', protectedRoutes);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

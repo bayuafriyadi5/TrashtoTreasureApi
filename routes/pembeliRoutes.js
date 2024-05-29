@@ -4,8 +4,9 @@ const pembeliController = require('../controllers/pembeliController');
 
 router.get('/', pembeliController.getAllPembeli);
 router.get('/find', pembeliController.findPembeliByName);
-router.get('/:id_penjual', pembeliController.getPembeliById);
-router.post('/', pembeliController.createPembeli);
+router.get('/:id_pembeli', pembeliController.getPembeliById);
+router.post('/register', pembeliController.registerPembeli);
+router.post('/login', pembeliController.loginPembeli);
 router.put('/', pembeliController.updatePembeli);
 router.delete('/', pembeliController.deletePembeli);
 

@@ -1,5 +1,59 @@
 const { Pembeli } = require('../models');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const response = require('../utils/response');
+
+exports.registerPembeli = async (req, res) => {
+    try {
+        const { nama, email, telepon, alamat, password } = req.body;
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new Pembeli
+        const result = await Pembeli.create({
+            nama,
+            email,
+            telepon,
+            alamat,
+            password: hashedPassword
+        });
+
+        response(201, result, "Successfully registered", res);
+    } catch (error) {
+        response(500, error, "Registration error", res);
+    }
+};
+
+exports.loginPembeli = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Find Pembeli by email
+        const pembeli = await Pembeli.findOne({ where: { email } });
+        if (!pembeli) {
+            return response(404, null, "User not found", res);
+        }
+
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, pembeli.password);
+        if (!isPasswordValid) {
+            return response(401, null, "Invalid credentials", res);
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ id_pembeli: pembeli.id_pembeli }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Update user token in the database
+        pembeli.token = token;
+        await pembeli.save();
+
+        response(200, { token }, "Login successful", res);
+    } catch (error) {
+        response(500, error, "Login error", res);
+    }
+};
+
 
 exports.getAllPembeli = async (req, res) => {
     try {
