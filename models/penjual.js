@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        no_rekening: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     }, {
         tableName: 'penjual',
         timestamps: false,
