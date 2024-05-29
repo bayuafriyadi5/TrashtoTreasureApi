@@ -55,7 +55,7 @@ exports.createTransaksi = async (req, res) => {
 
         const pembeli = req.pembeli;
 
-        if (!pembeli || !penjual) {
+        if (!pembeli) {
             return response(403, { error: "Unauthorized" }, "Only authenticated users can create transactions", res);
         }
 
