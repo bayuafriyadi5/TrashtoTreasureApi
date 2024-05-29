@@ -35,11 +35,6 @@ exports.loginPembeli = async (req, res) => {
             return response(404, null, "User not found", res);
         }
 
-        const penjual = await Penjual.findOne({ where: { email } });
-        if (!penjual) {
-            return response(404, null, "User not found", res);
-        }
-
         // Check password
         const isPasswordValid = await bcrypt.compare(password, pembeli.password);
         if (!isPasswordValid) {
@@ -51,9 +46,16 @@ exports.loginPembeli = async (req, res) => {
 
         // Update user token in the database
         pembeli.token = token;
-        penjual.token = token;
+
         await pembeli.save();
-        await penjual.save();
+
+
+        const penjual = await Penjual.findOne({ where: { email } });
+        if (penjual) {
+            penjual.token = token;
+            await penjual.save();
+        }
+
 
         response(200, { token }, "Login successful", res);
     } catch (error) {
