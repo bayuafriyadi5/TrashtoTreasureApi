@@ -68,10 +68,11 @@ exports.createPenjual = async (req, res) => {
 
 exports.updatePenjual = async (req, res) => {
     try {
-        const { id_penjual, nama, email, telepon, no_rekening } = req.body;
+        const penjual = req.penjual;
+        const { nama, email, telepon, no_rekening } = req.body;
         const result = await Penjual.update(
-            { nama, email, telepon, no_rekening },
-            { where: { id_penjual: id_penjual } }
+            { no_rekening },
+            { where: { id_penjual: penjual.id_penjual } }
         );
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully updated data", res);
