@@ -97,20 +97,12 @@ exports.findPembeliByName = async (req, res) => {
     }
 };
 
-exports.createPembeli = async (req, res) => {
-    try {
-        const { nama, email, telepon, alamat } = req.body;
-        const result = await Pembeli.create({ nama, email, telepon, alamat });
-        response(200, result, "Successfully insert data", res);
-    } catch (error) {
-        response(500, error, "error", res);
-    }
-};
 
 exports.updatePembeli = async (req, res) => {
     try {
-        const { id_pembeli, nama, email, telepon, alamat } = req.body;
-        const result = await Pembeli.update({ nama, email, telepon, alamat }, { where: { id_pembeli: id_pembeli } });
+        const pembeli = req.pembeli;
+        const { nama, email, telepon, alamat } = req.body;
+        const result = await Pembeli.update({ nama, email, telepon, alamat }, { where: { id_pembeli: pembeli.id_pembeli } });
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully update data", res);
         } else {

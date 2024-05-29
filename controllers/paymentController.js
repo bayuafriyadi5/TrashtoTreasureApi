@@ -48,7 +48,6 @@ const getInvoice = async (invoiceID) => {
 
 exports.createInvoice = async (req, res) => {
     try {
-        console.log('Request Body:', req.body);
         const randomString = crypto.randomBytes(4).toString('hex');
         const { amount } = req.body;
 
