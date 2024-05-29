@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Pembeli } = require('../models');
+const { Pembeli, Penjual } = require('../models');
 
 const authenticateToken = async (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
@@ -14,6 +14,13 @@ const authenticateToken = async (req, res, next) => {
             return res.status(401).json({ error: 'Invalid token' });
         }
         req.pembeli = pembeli;
+        next();
+
+        const penjual = await Penjual.findByPk(decoded.id_penjual);
+        if (!penjual || penjual.token !== token) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+        req.penjual = penjual;
         next();
     } catch (err) {
         res.status(400).json({ error: 'Invalid token' });
