@@ -62,7 +62,7 @@ exports.createProduk = [
             // if (!req.penjual) {
             //     return response(403, null, "Unauthorized: Only sellers can add products", res);
             // }
-            return req.penjual;
+            return req.penjual
             const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
 
