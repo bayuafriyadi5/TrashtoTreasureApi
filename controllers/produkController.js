@@ -57,7 +57,6 @@ exports.createProduk = [
     upload.single('foto_produk'),
     async (req, res) => {
         try {
-
             if (!req.penjual) {
                 return response(403, null, "Unauthorized: Only sellers can add products", res);
             }
