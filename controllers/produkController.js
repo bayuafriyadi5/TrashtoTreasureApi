@@ -57,11 +57,16 @@ exports.createProduk = [
     upload.single('foto_produk'),
     async (req, res) => {
         try {
-            const { nama_produk, desc_produk, harga_produk, stok_produk, id_penjual } = req.body;
+
+            if (!req.penjual) {
+                return response(403, null, "Unauthorized: Only sellers can add products", res);
+            }
+
+            const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
 
             // Validate that the provided id_penjual exists
-            const penjual = await Penjual.findByPk(id_penjual);
+            const penjual = await Penjual.findByPk(req.penjual.id_penjual);
             if (!penjual) {
                 return response(400, null, "Penjual not found", res);
             }
@@ -82,13 +87,13 @@ exports.createProduk = [
                 blobStream.on('finish', async () => {
                     // The public URL can be used to directly access the file via HTTP.
                     foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-                    const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual });
+                    const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual });
                     response(200, result, "Successfully insert data", res);
                 });
 
                 blobStream.end(foto_produk.buffer);
             } else {
-                const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual });
+                const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual });
                 response(200, result, "Successfully insert data", res);
             }
         } catch (error) {
@@ -101,11 +106,15 @@ exports.updateProduk = [
     upload.single('foto_produk'),
     async (req, res) => {
         try {
-            const { id_produk, nama_produk, desc_produk, harga_produk, stok_produk, id_penjual } = req.body;
+            if (!req.penjual) {
+                return response(403, null, "Unauthorized: Only sellers can add products", res);
+            }
+
+            const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
 
             // Validate that the provided id_penjual exists
-            const penjual = await Penjual.findByPk(id_penjual);
+            const penjual = await Penjual.findByPk(req.penjual.id_penjual);
             if (!penjual) {
                 return response(400, null, "Penjual not found", res);
             }
@@ -127,7 +136,7 @@ exports.updateProduk = [
                     // The public URL can be used to directly access the file via HTTP.
                     foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
                     const result = await Produk.update(
-                        { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual },
+                        { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual },
                         { where: { id_produk: id_produk } }
                     );
 
@@ -141,7 +150,7 @@ exports.updateProduk = [
                 blobStream.end(foto_produk.buffer);
             } else {
                 const result = await Produk.update(
-                    { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual },
+                    { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual },
                     { where: { id_produk: id_produk } }
                 );
 
