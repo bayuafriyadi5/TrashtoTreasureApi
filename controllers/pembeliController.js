@@ -6,7 +6,6 @@ const path = require('path');
 const bucket = require('../config/firebaseConfig');
 const response = require('../utils/response');
 
-
 const upload = multer({
     storage: multer.memoryStorage(), // Use memory storage
     fileFilter: (req, file, cb) => {
@@ -43,12 +42,14 @@ exports.registerPembeli = [
                 });
 
                 blobStream.on('finish', async () => {
-                    // Get the download token
-                    const [metadata] = await blob.getMetadata();
-                    const downloadToken = metadata.metadata.firebaseStorageDownloadTokens;
+                    // Generate the download token
+                    const downloadToken = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '01-01-2030' // Adjust the expiration date as needed
+                    });
 
-                    // Construct the photo URL with the download token
-                    photo_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(blob.name)}?alt=media&token=${downloadToken}`;
+                    // Construct the download URL with the token
+                    photo_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
 
                     const result = await Pembeli.create({
                         nama,
@@ -56,7 +57,7 @@ exports.registerPembeli = [
                         telepon,
                         password: hashedPassword,
                         alamat,
-                        photo_url // Save the photo URL with the download token
+                        photo_url // Save the photo URL
                     });
 
                     response(201, result, "Successfully registered", res);
@@ -78,6 +79,9 @@ exports.registerPembeli = [
         }
     }
 ];
+
+// Other exports remain unchanged
+
 
 
 exports.loginPembeli = async (req, res) => {
