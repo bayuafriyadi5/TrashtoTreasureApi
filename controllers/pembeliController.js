@@ -43,14 +43,20 @@ exports.registerPembeli = [
                 });
 
                 blobStream.on('finish', async () => {
-                    photo_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}`;
+                    // Get the download token
+                    const [metadata] = await blob.getMetadata();
+                    const downloadToken = metadata.metadata.firebaseStorageDownloadTokens;
+
+                    // Construct the photo URL with the download token
+                    photo_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(blob.name)}?alt=media&token=${downloadToken}`;
+
                     const result = await Pembeli.create({
                         nama,
                         email,
                         telepon,
                         password: hashedPassword,
                         alamat,
-                        photo_url // Save the photo URL
+                        photo_url // Save the photo URL with the download token
                     });
 
                     response(201, result, "Successfully registered", res);
