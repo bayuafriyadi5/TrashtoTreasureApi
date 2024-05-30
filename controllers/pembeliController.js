@@ -20,7 +20,7 @@ const upload = multer({
 });
 
 exports.registerPembeli = [
-    upload.single('photo'),
+    upload.single('photo_url'),
     async (req, res) => {
         try {
             const { nama, email, telepon, password } = req.body;
@@ -147,7 +147,7 @@ exports.findPembeliByName = async (req, res) => {
 
 
 exports.updatePembeli = [
-    upload.single('photo'),
+    upload.single('photo_url'),
     async (req, res) => {
         try {
             const pembeli = req.pembeli;
