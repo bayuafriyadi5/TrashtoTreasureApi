@@ -23,7 +23,7 @@ exports.registerPembeli = [
     upload.single('photo_url'),
     async (req, res) => {
         try {
-            const { nama, email, telepon, password } = req.body;
+            const { nama, email, telepon, password, alamat } = req.body;
             const photo = req.file;
 
             // Hash password
@@ -49,6 +49,7 @@ exports.registerPembeli = [
                         email,
                         telepon,
                         password: hashedPassword,
+                        alamat,
                         photo_url // Save the photo URL
                     });
 
