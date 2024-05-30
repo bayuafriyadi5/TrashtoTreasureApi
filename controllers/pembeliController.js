@@ -201,8 +201,7 @@ exports.updatePembeli = [
                         telepon,
                         alamat,
                         password: hashedPassword,
-                        photo_url,
-                        download_token: downloadToken // Update the download token in the database
+                        photo_url
                     }, { where: { id_pembeli: pembeli.id_pembeli } });
 
                     if (result[0]) {
