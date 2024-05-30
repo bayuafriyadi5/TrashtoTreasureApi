@@ -43,7 +43,7 @@ exports.registerPembeli = [
                 });
 
                 blobStream.on('finish', async () => {
-                    photo_url = `https://storage.googleapis.com/v0/${bucket.name}/vo/${blob.name}`;
+                    photo_url = `https://storage.googleapis.com/v0/b/${bucket.name}/vo/${blob.name}`;
                     const result = await Pembeli.create({
                         nama,
                         email,
