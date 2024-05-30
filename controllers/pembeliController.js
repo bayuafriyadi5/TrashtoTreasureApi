@@ -234,11 +234,18 @@ exports.updatePembeli = [
 ];
 
 exports.updatePembeliWithoutImage = async (req, res) => {
+
     try {
         const pembeli = req.pembeli;
+        hashedPassword = await bcrypt.hash(password, 10);
         const { nama, email, telepon, alamat, password } = req.body;
-        const result = await Pembeli.update(
-            { nama, email, telepon, alamat, password },
+        const result = await Pembeli.update({
+            nama,
+            email,
+            telepon,
+            alamat,
+            password: hashedPassword,
+        },
             { where: { id_pembeli: pembeli.id_pembeli } }
         );
         if (result[0]) {
