@@ -234,27 +234,35 @@ exports.updatePembeli = [
 ];
 
 exports.updatePembeliWithoutImage = async (req, res) => {
-
     try {
         const pembeli = req.pembeli;
-        hashedPassword = await bcrypt.hash(password, 10);
         const { nama, email, telepon, alamat, password } = req.body;
-        const result = await Pembeli.update({
+
+        // Hash the password if provided
+        let hashedPassword;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        const updateData = {
             nama,
             email,
             telepon,
-            alamat,
-            password: hashedPassword,
-        },
-            { where: { id_pembeli: pembeli.id_pembeli } }
-        );
+            alamat
+        };
+        if (password) {
+            updateData.password = hashedPassword;
+        }
+
+        const result = await Pembeli.update(updateData, { where: { id_pembeli: pembeli.id_pembeli } });
+
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully updated data", res);
         } else {
-            response(404, "User not found", "Error", res);
+            response(404, "User not found", "error", res);
         }
     } catch (error) {
-        response(500, error, "Error", res);
+        response(500, error, "Error updating data", res);
     }
 };
 
