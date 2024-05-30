@@ -1,6 +1,9 @@
 const { Pembeli, Penjual } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const bucket = require('../config/firebaseConfig');
 const response = require('../utils/response');
 
 
