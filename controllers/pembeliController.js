@@ -172,6 +172,8 @@ exports.updatePembeli = [
             }
 
             let photo_url = pembeli.photo_url; // Use existing photo URL if not updated
+            let downloadToken = pembeli.download_token; // Retain existing download token
+
             if (photo) {
                 const blob = bucket.file(Date.now() + path.extname(photo.originalname));
                 const blobStream = blob.createWriteStream({
@@ -185,7 +187,13 @@ exports.updatePembeli = [
                 });
 
                 blobStream.on('finish', async () => {
-                    photo_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    // Generate the download token
+                    downloadToken = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '01-01-2030' // Adjust the expiration date as needed
+                    });
+
+                    photo_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
 
                     const result = await Pembeli.update({
                         nama,
@@ -193,7 +201,8 @@ exports.updatePembeli = [
                         telepon,
                         alamat,
                         password: hashedPassword,
-                        photo_url
+                        photo_url,
+                        download_token: downloadToken // Update the download token in the database
                     }, { where: { id_pembeli: pembeli.id_pembeli } });
 
                     if (result[0]) {
@@ -224,6 +233,7 @@ exports.updatePembeli = [
         }
     }
 ];
+
 
 
 exports.deletePembeli = async (req, res) => {
