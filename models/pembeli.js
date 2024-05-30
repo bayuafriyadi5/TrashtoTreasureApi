@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        photo_url: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     }, {
         tableName: 'pembeli',
         timestamps: false,

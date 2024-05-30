@@ -3,26 +3,72 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const response = require('../utils/response');
 
-exports.registerPembeli = async (req, res) => {
-    try {
-        const { nama, email, telepon, password } = req.body;
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+const upload = multer({
+    storage: multer.memoryStorage(), // Use memory storage
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
+        }
+    },
+    limits: { fileSize: 1024 * 1024 * 5 } // Limit file size to 5MB
+});
 
-        // Create new Pembeli
-        const result = await Pembeli.create({
-            nama,
-            email,
-            telepon,
-            password: hashedPassword
-        });
+exports.registerPembeli = [
+    upload.single('photo'),
+    async (req, res) => {
+        try {
+            const { nama, email, telepon, password } = req.body;
+            const photo = req.file;
 
-        response(201, result, "Successfully registered", res);
-    } catch (error) {
-        response(500, error, "Registration error", res);
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            let photo_url = null;
+            if (photo) {
+                const blob = bucket.file(Date.now() + path.extname(photo.originalname));
+                const blobStream = blob.createWriteStream({
+                    metadata: {
+                        contentType: photo.mimetype
+                    }
+                });
+
+                blobStream.on('error', error => {
+                    throw new Error('Something is wrong! Unable to upload at the moment.');
+                });
+
+                blobStream.on('finish', async () => {
+                    photo_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    const result = await Pembeli.create({
+                        nama,
+                        email,
+                        telepon,
+                        password: hashedPassword,
+                        photo_url // Save the photo URL
+                    });
+
+                    response(201, result, "Successfully registered", res);
+                });
+
+                blobStream.end(photo.buffer);
+            } else {
+                const result = await Pembeli.create({
+                    nama,
+                    email,
+                    telepon,
+                    password: hashedPassword
+                });
+
+                response(201, result, "Successfully registered", res);
+            }
+        } catch (error) {
+            response(500, error, "Registration error", res);
+        }
     }
-};
+];
+
 
 exports.loginPembeli = async (req, res) => {
     try {
@@ -97,31 +143,74 @@ exports.findPembeliByName = async (req, res) => {
 };
 
 
-exports.updatePembeli = async (req, res) => {
-    try {
-        const pembeli = req.pembeli;
-        const { nama, email, telepon, alamat, password } = req.body;
+exports.updatePembeli = [
+    upload.single('photo'),
+    async (req, res) => {
+        try {
+            const pembeli = req.pembeli;
+            const { nama, email, telepon, alamat, password } = req.body;
+            const photo = req.file;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
+            // Hash the password if provided
+            let hashedPassword;
+            if (password) {
+                hashedPassword = await bcrypt.hash(password, 10);
+            }
 
-        const result = await Pembeli.update({
-            nama,
-            email,
-            telepon,
-            alamat,
-            password: hashedPassword // Use the hashed password
-        }, { where: { id_pembeli: pembeli.id_pembeli } });
+            let photo_url = pembeli.photo_url; // Use existing photo URL if not updated
+            if (photo) {
+                const blob = bucket.file(Date.now() + path.extname(photo.originalname));
+                const blobStream = blob.createWriteStream({
+                    metadata: {
+                        contentType: photo.mimetype
+                    }
+                });
 
-        if (result[0]) {
-            response(200, { isSuccess: result[0] }, "Successfully update data", res);
-        } else {
-            response(404, "user not found", "error", res);
+                blobStream.on('error', error => {
+                    throw new Error('Something is wrong! Unable to upload at the moment.');
+                });
+
+                blobStream.on('finish', async () => {
+                    photo_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
+                    const result = await Pembeli.update({
+                        nama,
+                        email,
+                        telepon,
+                        alamat,
+                        password: hashedPassword,
+                        photo_url
+                    }, { where: { id_pembeli: pembeli.id_pembeli } });
+
+                    if (result[0]) {
+                        response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+                    } else {
+                        response(404, "User not found", "error", res);
+                    }
+                });
+
+                blobStream.end(photo.buffer);
+            } else {
+                const result = await Pembeli.update({
+                    nama,
+                    email,
+                    telepon,
+                    alamat,
+                    password: hashedPassword
+                }, { where: { id_pembeli: pembeli.id_pembeli } });
+
+                if (result[0]) {
+                    response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+                } else {
+                    response(404, "User not found", "error", res);
+                }
+            }
+        } catch (error) {
+            response(500, error, "Error updating data", res);
         }
-    } catch (error) {
-        response(500, error, "error", res);
     }
-};
+];
+
 
 exports.deletePembeli = async (req, res) => {
     try {
