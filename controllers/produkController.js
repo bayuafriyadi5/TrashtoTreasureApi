@@ -84,9 +84,15 @@ exports.createProduk = [
                 });
 
                 blobStream.on('finish', async () => {
-                    // The public URL can be used to directly access the file via HTTP.
-                    foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-                    const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual });
+                    // Generate the download token
+                    const downloadToken = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '01-01-2030' // Adjust the expiration date as needed
+                    });
+                    foto_produk_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
+
+
+                    const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk_url, id_penjual: req.penjual.id_penjual });
                     response(200, result, "Successfully insert data", res);
                 });
 
