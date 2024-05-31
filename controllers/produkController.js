@@ -80,29 +80,42 @@ exports.createProduk = [
                 });
 
                 blobStream.on('error', error => {
-                    throw new Error('Something is wrong! Unable to upload at the moment.');
+                    response(500, { error: error.message }, "Error uploading image", res);
                 });
 
                 blobStream.on('finish', async () => {
-                    // Generate the download token
                     const downloadToken = await blob.getSignedUrl({
                         action: 'read',
                         expires: '01-01-2030' // Adjust the expiration date as needed
                     });
+
                     foto_produk_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
 
-
-                    const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk_url, id_penjual: req.penjual.id_penjual });
+                    const result = await Produk.create({
+                        nama_produk,
+                        desc_produk,
+                        harga_produk,
+                        stok_produk,
+                        foto_produk: foto_produk_url,
+                        id_penjual: req.penjual.id_penjual
+                    });
                     response(200, result, "Successfully insert data", res);
                 });
 
                 blobStream.end(foto_produk.buffer);
             } else {
-                const result = await Produk.create({ nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual });
+                const result = await Produk.create({
+                    nama_produk,
+                    desc_produk,
+                    harga_produk,
+                    stok_produk,
+                    foto_produk: foto_produk_url,
+                    id_penjual: req.penjual.id_penjual
+                });
                 response(200, result, "Successfully insert data", res);
             }
         } catch (error) {
-            response(500, error, "error", res);
+            response(500, { error: error.message }, "error", res);
         }
     }
 ];
@@ -112,9 +125,10 @@ exports.updateProduk = [
     async (req, res) => {
         try {
             if (!req.penjual) {
-                return response(403, null, "Unauthorized: Only sellers can add products", res);
+                return response(403, null, "Unauthorized: Only sellers can update products", res);
             }
 
+            const { id_produk } = req.params;
             const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
 
@@ -134,19 +148,26 @@ exports.updateProduk = [
                 });
 
                 blobStream.on('error', error => {
-                    throw new Error('Something is wrong! Unable to upload at the moment.');
+                    response(500, { error: error.message }, "Error uploading image", res);
                 });
 
                 blobStream.on('finish', async () => {
-                    // The public URL can be used to directly access the file via HTTP.
                     foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
                     const result = await Produk.update(
-                        { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual },
+                        {
+                            nama_produk,
+                            desc_produk,
+                            harga_produk,
+                            stok_produk,
+                            foto_produk: foto_produk_url,
+                            id_penjual: req.penjual.id_penjual
+                        },
                         { where: { id_produk: id_produk } }
                     );
 
                     if (result[0]) {
-                        response(200, { isSuccess: result[0] }, "Successfully update data", res);
+                        response(200, { isSuccess: result[0] }, "Successfully updated data", res);
                     } else {
                         response(404, "Produk not found", "error", res);
                     }
@@ -155,18 +176,25 @@ exports.updateProduk = [
                 blobStream.end(foto_produk.buffer);
             } else {
                 const result = await Produk.update(
-                    { nama_produk, desc_produk, harga_produk, stok_produk, foto_produk: foto_produk_url, id_penjual: req.penjual.id_penjual },
+                    {
+                        nama_produk,
+                        desc_produk,
+                        harga_produk,
+                        stok_produk,
+                        foto_produk: foto_produk_url,
+                        id_penjual: req.penjual.id_penjual
+                    },
                     { where: { id_produk: id_produk } }
                 );
 
                 if (result[0]) {
-                    response(200, { isSuccess: result[0] }, "Successfully update data", res);
+                    response(200, { isSuccess: result[0] }, "Successfully updated data", res);
                 } else {
                     response(404, "Produk not found", "error", res);
                 }
             }
         } catch (error) {
-            response(500, error, "error", res);
+            response(500, { error: error.message }, "error", res);
         }
     }
 ];
@@ -181,6 +209,6 @@ exports.deleteProduk = async (req, res) => {
             response(404, "Produk not found", "error", res);
         }
     } catch (error) {
-        response(500, error, "error", res);
+        response(500, { error: error.message }, "error", res);
     }
 };
