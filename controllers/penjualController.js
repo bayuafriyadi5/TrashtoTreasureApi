@@ -47,9 +47,9 @@ exports.getPenjualById = async (req, res) => {
     }
 };
 
-exports.findPenjualByName = async (req, res) => {
+exports.findPenjualByEmail = async (req, res) => {
     try {
-        const result = await Penjual.findOne({ where: { nama: req.query.nama } });
+        const result = await Penjual.findOne({ where: { email: req.query.email } });
         response(200, result, "Search Penjual by name", res);
     } catch (error) {
         response(500, error, "Error", res);
