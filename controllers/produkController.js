@@ -44,7 +44,10 @@ exports.getProdukById = async (req, res) => {
 exports.findProdukByName = async (req, res) => {
     try {
         const { nama_produk } = req.query;
+        console.log("Request received for findProdukByName with nama_produk:", nama_produk);
+
         if (!nama_produk) {
+            console.log("Product name is missing in the request");
             return response(400, null, "Product name is required", res);
         }
 
@@ -54,15 +57,18 @@ exports.findProdukByName = async (req, res) => {
         });
 
         if (!result) {
+            console.log("No product found with name:", nama_produk);
             return response(404, null, "Product not found", res);
         }
 
+        console.log("Product found:", result);
         response(200, result, "search produk name", res);
     } catch (error) {
         console.error("Error fetching product by name:", error);
         response(500, error, "error", res);
     }
 };
+
 
 
 exports.findProdukByPenjual = async (req, res) => {
