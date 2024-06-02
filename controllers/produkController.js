@@ -43,27 +43,51 @@ exports.getProdukById = async (req, res) => {
 
 exports.findProdukByName = async (req, res) => {
     try {
+        const { nama_produk } = req.query;
+        if (!nama_produk) {
+            return response(400, null, "Product name is required", res);
+        }
+
         const result = await Produk.findOne({
-            where: { nama_produk: req.query.nama_produk },
+            where: { nama_produk },
             include: { model: Penjual, as: 'penjual' }
         });
+
+        if (!result) {
+            return response(404, null, "Product not found", res);
+        }
+
         response(200, result, "search produk name", res);
     } catch (error) {
+        console.error("Error fetching product by name:", error);
         response(500, error, "error", res);
     }
 };
 
+
 exports.findProdukByPenjual = async (req, res) => {
     try {
-        const result = await Produk.findOne({
-            where: { id_penjual: req.query.id_penjual },
+        const { id_penjual } = req.query;
+        if (!id_penjual) {
+            return response(400, null, "Seller ID is required", res);
+        }
+
+        const result = await Produk.findAll({
+            where: { id_penjual },
             include: { model: Penjual, as: 'penjual' }
         });
+
+        if (result.length === 0) {
+            return response(404, null, "Products for this seller not found", res);
+        }
+
         response(200, result, "Search Produk by penjual", res);
     } catch (error) {
+        console.error("Error fetching products by seller:", error);
         response(500, error, "Error", res);
     }
 };
+
 
 exports.createProduk = [
     upload.single('foto_produk'),
