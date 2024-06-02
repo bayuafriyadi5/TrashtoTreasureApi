@@ -53,6 +53,14 @@ exports.findProdukByName = async (req, res) => {
     }
 };
 
+exports.findProdukByPenjual = async (req, res) => {
+    try {
+        const result = await Produk.findOne({ where: { id_penjual: req.query.id_penjual } });
+        response(200, result, "Search Produk by penjual", res);
+    } catch (error) {
+        response(500, error, "Error", res);
+    }
+};
 exports.createProduk = [
     upload.single('foto_produk'),
     async (req, res) => {
