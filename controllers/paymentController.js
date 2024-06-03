@@ -48,11 +48,11 @@ const getInvoice = async (invoiceID) => {
 
 exports.createInvoice = async (req, res) => {
     try {
-        const randomString = crypto.randomBytes(4).toString('hex');
+
         const { amount } = req.body;
 
         const data = {
-            external_id: `invoice - ${randomString}`,
+            external_id,
             description: "Produk Daur Ulang",
             amount,
             currency: "IDR",
