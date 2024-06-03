@@ -45,57 +45,14 @@ const getInvoice = async (invoiceID) => {
     }
 };
 
-const getAllInvoices = async () => {
-    const config = {
-        auth: {
-            username: XENDIT_API_KEY,
-            password: '',
-        },
-    };
-
-    try {
-        const res = await axios.get(XENDIT_API_URL, config);
-        return res.data;
-    } catch (error) {
-        console.error('Error in getAllInvoices:', error.response ? error.response.data : error.message);
-        throw new Error(error.response ? error.response.data.message : error.message);
-    }
-};
-
-
-
-const getInvoiceByExternalId = async (external_id) => {
-    const config = {
-        auth: {
-            username: XENDIT_API_KEY,
-            password: '',
-        },
-        params: {
-            external_id: external_id,
-        },
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
-
-    try {
-        const res = await axios.get(XENDIT_API_URL, config);
-        if (res.data.length === 0) {
-            throw new Error(`Invoice with external_id ${external_id} not found`);
-        }
-        return res.data[0]; // Assuming the first match is the desired invoice
-    } catch (error) {
-        console.error('Error in getInvoiceByExternalId:', error.response ? error.response.data : error.message);
-        throw new Error(error.response ? error.response.data.message : error.message);
-    }
-};
 
 exports.createInvoice = async (req, res) => {
     try {
-        const { external_id, amount } = req.body;
+        const randomString = crypto.randomBytes(4).toString('hex');
+        const { amount } = req.body;
 
         const data = {
-            external_id,
+            external_id: `invoice - ${randomString}`,
             description: "Produk Daur Ulang",
             amount,
             currency: "IDR",
@@ -125,20 +82,4 @@ exports.getInvoice = async (req, res) => {
     }
 };
 
-exports.getInvoiceByExternalId = async (req, res) => {
-    try {
-        const { external_id } = req.query; // Use req.query to fetch the external_id from the query string
-
-        if (!external_id) {
-            return response(400, {}, 'external_id is required', res);
-        }
-
-        const fetchedInvoice = await getInvoiceByExternalId(external_id);
-
-        response(200, fetchedInvoice, 'Successfully fetched invoice by external_id', res);
-    } catch (error) {
-        console.error('Error fetching invoice by external_id:', error.message);
-        response(500, { error: error.message }, 'Error fetching invoice by external_id', res);
-    }
-};
 
