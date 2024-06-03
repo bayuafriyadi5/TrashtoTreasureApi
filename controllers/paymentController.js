@@ -45,10 +45,41 @@ const getInvoice = async (invoiceID) => {
     }
 };
 
+const getAllInvoices = async () => {
+    const config = {
+        auth: {
+            username: XENDIT_API_KEY,
+            password: '',
+        },
+    };
+
+    try {
+        const res = await axios.get(XENDIT_API_URL, config);
+        return res.data;
+    } catch (error) {
+        console.error('Error in getAllInvoices:', error.response ? error.response.data : error.message);
+        throw new Error(error.response ? error.response.data.message : error.message);
+    }
+};
+
+const getInvoiceByExternalId = async (external_id) => {
+    try {
+        const allInvoices = await getAllInvoices();
+        const invoice = allInvoices.find(invoice => invoice.external_id === external_id);
+
+        if (!invoice) {
+            throw new Error(`Invoice with external_id ${external_id} not found`);
+        }
+
+        return invoice;
+    } catch (error) {
+        console.error('Error in getInvoiceByExternalId:', error.message);
+        throw new Error(error.message);
+    }
+};
 
 exports.createInvoice = async (req, res) => {
     try {
-
         const { external_id, amount } = req.body;
 
         const data = {
@@ -82,4 +113,15 @@ exports.getInvoice = async (req, res) => {
     }
 };
 
+exports.getInvoiceByExternalId = async (req, res) => {
+    try {
+        const { external_id } = req.params;
 
+        const fetchedInvoice = await getInvoiceByExternalId(external_id);
+
+        response(200, fetchedInvoice, 'Successfully fetched invoice by external_id', res);
+    } catch (error) {
+        console.error('Error fetching invoice by external_id:', error.message);
+        response(500, { error: error.message }, 'Error fetching invoice by external_id', res);
+    }
+};
