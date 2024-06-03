@@ -95,6 +95,23 @@ exports.updateTransaksi = async (req, res) => {
     }
 };
 
+exports.updateTransaksiInvoice = async (req, res) => {
+    try {
+        const { id_transaksi, invoice_id, invoice_url } = req.body;
+        const result = await Transaksi.update(
+            { invoice_id, invoice_url },
+            { where: { id_transaksi } }
+        );
+        if (result[0]) {
+            response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+        } else {
+            response(404, "Transaksi not found", "Error", res);
+        }
+    } catch (error) {
+        response(500, { error: error.message }, "Error updating data", res);
+    }
+};
+
 exports.deleteTransaksi = async (req, res) => {
     try {
         const { id_transaksi } = req.body;
