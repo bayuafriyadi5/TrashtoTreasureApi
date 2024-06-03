@@ -49,7 +49,7 @@ const getInvoice = async (invoiceID) => {
 exports.createInvoice = async (req, res) => {
     try {
 
-        const { amount } = req.body;
+        const { external_id, amount } = req.body;
 
         const data = {
             external_id,
