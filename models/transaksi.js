@@ -43,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
 
         },
+        alamat: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     }, {
         tableName: 'transaksi',
         timestamps: true,

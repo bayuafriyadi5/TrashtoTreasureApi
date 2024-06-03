@@ -36,7 +36,7 @@ exports.getTransaksiById = async (req, res) => {
 
 exports.createTransaksi = async (req, res) => {
     try {
-        const { total_harga, id_produk, id_penjual, qty, invoice_id, invoice_url } = req.body;
+        const { total_harga, id_produk, id_penjual, qty, invoice_id, invoice_url, alamat } = req.body;
 
         // Fetch the associated Produk record
         const produk = await Produk.findOne({ where: { id_produk } });
@@ -67,7 +67,8 @@ exports.createTransaksi = async (req, res) => {
             id_produk,
             qty,
             invoice_id,
-            invoice_url
+            invoice_url,
+            alamat
         });
 
         response(200, result, "Successfully inserted data", res);
@@ -79,9 +80,9 @@ exports.createTransaksi = async (req, res) => {
 
 exports.updateTransaksi = async (req, res) => {
     try {
-        const { id_transaksi, status, id_pembeli, total_harga, id_penjual, id_produk, qty, invoice_id, invoice_url } = req.body;
+        const { id_transaksi, status, id_pembeli, total_harga, id_penjual, id_produk, qty, invoice_id, invoice_url, alamat } = req.body;
         const result = await Transaksi.update(
-            { status, id_pembeli, total_harga, id_penjual, qty, invoice_id, id_produk, invoice_url },
+            { status, id_pembeli, total_harga, id_penjual, qty, invoice_id, id_produk, invoice_url, alamat },
             { where: { id_transaksi } }
         );
         if (result[0]) {
@@ -107,8 +108,6 @@ exports.deleteTransaksi = async (req, res) => {
         const produk = await Produk.findOne({ where: { id_produk: transaksi.id_produk } });
 
         if (produk) {
-            // Handle the related Produk record as needed (e.g., delete, update, etc.)
-            // Example: set the foreign key to null
             await Produk.update({ id_produk: null }, { where: { id_produk: produk.id_produk } });
         }
 
