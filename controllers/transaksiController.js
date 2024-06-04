@@ -34,6 +34,52 @@ exports.getTransaksiById = async (req, res) => {
     }
 };
 
+exports.findTransaksiByPembeli = async (req, res) => {
+    try {
+        const { id_pembeli } = req.query;
+        if (!id_pembeli) {
+            return response(400, null, "Buyer ID is required", res);
+        }
+
+        const result = await Transaksi.findAll({
+            where: { id_pembeli },
+            include: { model: Pembeli, as: 'pembeli' }
+        });
+
+        if (result.length === 0) {
+            return response(404, null, "Transaksi for this buyer not found", res);
+        }
+
+        response(200, result, "Search Transaksi by buyer", res);
+    } catch (error) {
+        console.error("Error fetching transaksi by buyer:", error);
+        response(500, error, "Error", res);
+    }
+};
+
+exports.findTransaksiByPenjual = async (req, res) => {
+    try {
+        const { id_penjual } = req.query;
+        if (!id_penjual) {
+            return response(400, null, "Penjual ID is required", res);
+        }
+
+        const result = await Transaksi.findAll({
+            where: { id_penjual },
+            include: { model: Penjual, as: 'penjual' }
+        });
+
+        if (result.length === 0) {
+            return response(404, null, "Transaksi for this seller not found", res);
+        }
+
+        response(200, result, "Search Transaksi by penjual", res);
+    } catch (error) {
+        console.error("Error fetching Transaksi by seller:", error);
+        response(500, error, "Error", res);
+    }
+};
+
 exports.createTransaksi = async (req, res) => {
     try {
         const { total_harga, id_produk, id_penjual, qty, invoice_id, invoice_url, alamat } = req.body;

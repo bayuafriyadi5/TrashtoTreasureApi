@@ -5,6 +5,8 @@ const authenticateToken = require('../middleware/auth');
 
 router.get('/', transaksiController.getTransaksi);
 router.get('/:id_transaksi', transaksiController.getTransaksiById);
+router.get('/findpembeli', authenticateToken, transaksiController.findTransaksiByPembeli);
+router.get('/findpenjual', authenticateToken, transaksiController.findTransaksiByPenjual);
 router.post('/', authenticateToken, transaksiController.createTransaksi);
 router.put('/updateinvoice', authenticateToken, transaksiController.updateTransaksiInvoice);
 router.put('/', authenticateToken, transaksiController.updateTransaksi);
