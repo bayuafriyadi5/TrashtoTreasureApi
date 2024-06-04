@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        status_pesanan: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     }, {
         tableName: 'transaksi',
         timestamps: true,

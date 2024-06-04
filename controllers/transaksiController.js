@@ -92,7 +92,7 @@ exports.findTransaksiByPenjual = async (req, res) => {
 
 exports.createTransaksi = async (req, res) => {
     try {
-        const { total_harga, id_produk, id_penjual, qty, invoice_id, invoice_url, alamat } = req.body;
+        const { total_harga, id_produk, id_penjual, qty, invoice_id, invoice_url, alamat, status_pesanan } = req.body;
 
         // Fetch the associated Produk record
         const produk = await Produk.findOne({ where: { id_produk } });
@@ -124,7 +124,8 @@ exports.createTransaksi = async (req, res) => {
             qty,
             invoice_id,
             invoice_url,
-            alamat
+            alamat,
+            status_pesanan: "Disiapkan"
         });
 
         response(200, result, "Successfully inserted data", res);
@@ -153,9 +154,9 @@ exports.updateTransaksi = async (req, res) => {
 
 exports.updateTransaksiInvoice = async (req, res) => {
     try {
-        const { id_transaksi, invoice_id, invoice_url } = req.body;
+        const { id_transaksi, invoice_id, invoice_url, status_pesanan } = req.body;
         const result = await Transaksi.update(
-            { invoice_id, invoice_url },
+            { invoice_id, invoice_url, status_pesanan },
             { where: { id_transaksi } }
         );
         if (result[0]) {
