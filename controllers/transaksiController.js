@@ -43,7 +43,11 @@ exports.findTransaksiByPembeli = async (req, res) => {
 
         const result = await Transaksi.findAll({
             where: { id_pembeli },
-            include: { model: Pembeli, as: 'pembeli' }
+            include: [
+                { model: Pembeli, as: 'pembeli' },
+                { model: Penjual, as: 'penjual' }, // Include related Penjual if needed
+                { model: Produk, as: 'produk' } // Include related Produk if needed
+            ]
         });
 
         if (result.length === 0) {
@@ -53,9 +57,10 @@ exports.findTransaksiByPembeli = async (req, res) => {
         response(200, result, "Search Transaksi by buyer", res);
     } catch (error) {
         console.error("Error fetching transaksi by buyer:", error);
-        response(500, error, "Error", res);
+        response(500, { error: error.message }, "Error", res);
     }
 };
+
 
 exports.findTransaksiByPenjual = async (req, res) => {
     try {
@@ -66,7 +71,11 @@ exports.findTransaksiByPenjual = async (req, res) => {
 
         const result = await Transaksi.findAll({
             where: { id_penjual },
-            include: { model: Penjual, as: 'penjual' }
+            include: [
+                { model: Penjual, as: 'penjual' },
+                { model: Pembeli, as: 'pembeli' }, // Include related Pembeli if needed
+                { model: Produk, as: 'produk' } // Include related Produk if needed
+            ]
         });
 
         if (result.length === 0) {
@@ -76,9 +85,10 @@ exports.findTransaksiByPenjual = async (req, res) => {
         response(200, result, "Search Transaksi by penjual", res);
     } catch (error) {
         console.error("Error fetching Transaksi by seller:", error);
-        response(500, error, "Error", res);
+        response(500, { error: error.message }, "Error", res);
     }
 };
+
 
 exports.createTransaksi = async (req, res) => {
     try {
