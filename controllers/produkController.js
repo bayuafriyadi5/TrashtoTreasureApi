@@ -171,7 +171,7 @@ exports.updateProduk = [
                 return response(403, null, "Unauthorized: Only sellers can update products", res);
             }
 
-            const { id_produk } = req.params;
+            const { id_produk } = req.params; // Ensure id_produk is extracted from req.params
             const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
             const foto_produk = req.file;
 
@@ -258,6 +258,7 @@ exports.updateProduk = [
         }
     }
 ];
+
 
 
 exports.deleteProduk = async (req, res) => {
