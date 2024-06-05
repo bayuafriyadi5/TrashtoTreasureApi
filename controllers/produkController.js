@@ -241,40 +241,6 @@ exports.updateProduk = [
     }
 ];
 
-exports.updateStok = async (req, res) => {
-    try {
-        const produk = req.produk;
-
-        if (!produk || !produk.id_produk) {
-            return response(400, "Invalid product data", "error", res);
-        }
-
-        const { harga_produk, stok_produk } = req.body;
-
-        if (harga_produk == null || stok_produk == null) {
-            return response(400, "Missing required fields", "error", res);
-        }
-
-        const updateData = {
-            harga_produk,
-            stok_produk
-        };
-
-        const [updatedRows] = await Produk.update(updateData, { where: { id_produk: produk.id_produk } });
-
-        if (updatedRows) {
-            response(200, { isSuccess: true }, "Successfully updated data", res);
-        } else {
-            response(404, "Product not found", "error", res);
-        }
-    } catch (error) {
-        response(500, error.message || "Error updating data", "error", res);
-    }
-};
-
-
-
-
 exports.deleteProduk = async (req, res) => {
     try {
         const { id_produk } = req.body;
