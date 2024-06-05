@@ -274,6 +274,7 @@ exports.updateStok = async (req, res) => {
 
 
 
+
 exports.deleteProduk = async (req, res) => {
     try {
         const { id_produk } = req.body;
