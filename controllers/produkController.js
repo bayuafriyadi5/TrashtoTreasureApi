@@ -167,6 +167,7 @@ exports.updateProduk = [
     async (req, res) => {
         try {
             if (!req.penjual) {
+                console.log("Unauthorized: Only sellers can update products");
                 return response(403, null, "Unauthorized: Only sellers can update products", res);
             }
 
@@ -177,6 +178,7 @@ exports.updateProduk = [
             // Validate that the provided id_penjual exists
             const penjual = await Penjual.findByPk(req.penjual.id_penjual);
             if (!penjual) {
+                console.log("Penjual not found");
                 return response(400, null, "Penjual not found", res);
             }
 
@@ -190,28 +192,41 @@ exports.updateProduk = [
                 });
 
                 blobStream.on('error', error => {
+                    console.error("Error uploading image:", error);
                     response(500, { error: error.message }, "Error uploading image", res);
                 });
 
                 blobStream.on('finish', async () => {
-                    foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    try {
+                        const downloadToken = await blob.getSignedUrl({
+                            action: 'read',
+                            expires: '01-01-2030' // Adjust the expiration date as needed
+                        });
 
-                    const result = await Produk.update(
-                        {
-                            nama_produk,
-                            desc_produk,
-                            harga_produk,
-                            stok_produk,
-                            foto_produk: foto_produk_url,
-                            id_penjual: req.penjual.id_penjual
-                        },
-                        { where: { id_produk: id_produk } }
-                    );
+                        foto_produk_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
 
-                    if (result[0]) {
-                        response(200, { isSuccess: result[0] }, "Successfully updated data", res);
-                    } else {
-                        response(404, "Produk not found", "error", res);
+                        const result = await Produk.update(
+                            {
+                                nama_produk,
+                                desc_produk,
+                                harga_produk,
+                                stok_produk,
+                                foto_produk: foto_produk_url,
+                                id_penjual: req.penjual.id_penjual
+                            },
+                            { where: { id_produk: id_produk } }
+                        );
+
+                        if (result[0]) {
+                            console.log("Successfully updated data");
+                            response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+                        } else {
+                            console.log("Produk not found");
+                            response(404, "Produk not found", "error", res);
+                        }
+                    } catch (error) {
+                        console.error("Error during database update:", error);
+                        response(500, { error: error.message }, "Error updating data", res);
                     }
                 });
 
@@ -230,16 +245,20 @@ exports.updateProduk = [
                 );
 
                 if (result[0]) {
+                    console.log("Successfully updated data");
                     response(200, { isSuccess: result[0] }, "Successfully updated data", res);
                 } else {
+                    console.log("Produk not found");
                     response(404, "Produk not found", "error", res);
                 }
             }
         } catch (error) {
-            response(500, { error: error.message }, "error", res);
+            console.error("Error updating data:", error);
+            response(500, { error: error.message }, "Error updating data", res);
         }
     }
 ];
+
 
 exports.deleteProduk = async (req, res) => {
     try {
