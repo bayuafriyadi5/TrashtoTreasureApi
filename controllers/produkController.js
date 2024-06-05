@@ -244,12 +244,12 @@ exports.updateProduk = [
 exports.updateStok = async (req, res) => {
     try {
         const produk = req.produk;
-        const { harga, stok } = req.body;
+        const { harga_produk, stok_produk } = req.body;
 
 
         const updateData = {
-            harga,
-            stok
+            harga_produk,
+            stok_produk
 
         };
 
