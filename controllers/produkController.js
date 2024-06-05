@@ -241,6 +241,31 @@ exports.updateProduk = [
     }
 ];
 
+exports.updateStok = async (req, res) => {
+    try {
+        const produk = req.produk;
+        const { harga, stok } = req.body;
+
+
+        const updateData = {
+            harga,
+            stok
+
+        };
+
+        const result = await Produk.update(updateData, { where: { id_produk: produk.id_produk } });
+
+        if (result[0]) {
+            response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+        } else {
+            response(404, "User not found", "error", res);
+        }
+    } catch (error) {
+        response(500, error, "Error updating data", res);
+    }
+};
+
+
 exports.deleteProduk = async (req, res) => {
     try {
         const { id_produk } = req.body;

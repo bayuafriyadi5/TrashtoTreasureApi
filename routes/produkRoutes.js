@@ -9,6 +9,7 @@ router.get('/findpenjual', authenticateToken, produkController.findProdukByPenju
 router.get('/:id_produk', authenticateToken, produkController.getProdukById);
 router.post('/', authenticateToken, produkController.createProduk);
 router.put('/', authenticateToken, produkController.updateProduk);
+router.put('/restok', authenticateToken, produkController.updateStok);
 router.delete('/', authenticateToken, produkController.deleteProduk);
 
 module.exports = router;
