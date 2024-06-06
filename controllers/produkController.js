@@ -194,7 +194,12 @@ exports.updateProduk = [
                 });
 
                 blobStream.on('finish', async () => {
-                    foto_produk_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    const downloadToken = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '01-01-2030' // Adjust the expiration date as needed
+                    });
+
+                    foto_produk_url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${blob.name}?alt=media&token=${downloadToken}`;
 
                     const result = await Produk.update(
                         {
