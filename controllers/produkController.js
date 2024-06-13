@@ -259,9 +259,6 @@ exports.updateProdukWithoutImage = async (req, res) => {
             harga_produk,
             stok_produk
         };
-        if (password) {
-            updateData.password = hashedPassword;
-        }
 
         const result = await Produk.update(updateData, { where: { id_produk: id_produk } });
 
