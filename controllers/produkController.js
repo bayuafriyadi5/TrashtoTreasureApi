@@ -265,7 +265,7 @@ exports.updateProdukWithoutImage = async (req, res) => {
         if (result[0]) {
             response(200, { isSuccess: result[0] }, "Successfully updated data", res);
         } else {
-            response(404, "User not found", "error", res);
+            response(404, "Produk not found", "error", res);
         }
     } catch (error) {
         response(500, error, "Error updating data", res);
