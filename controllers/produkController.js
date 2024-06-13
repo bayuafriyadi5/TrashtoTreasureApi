@@ -3,6 +3,7 @@ const response = require('../utils/response');
 const multer = require('multer');
 const path = require('path');
 const bucket = require('../config/firebaseConfig'); // Import Firebase bucket
+const produk = require('../models/produk');
 
 const upload = multer({
     storage: multer.memoryStorage(), // Use memory storage
@@ -245,6 +246,34 @@ exports.updateProduk = [
         }
     }
 ];
+
+exports.updateProdukWithoutImage = async (req, res) => {
+    try {
+        const { id_produk } = req.params;
+        const { nama_produk, desc_produk, harga_produk, stok_produk } = req.body;
+
+
+        const updateData = {
+            nama_produk,
+            desc_produk,
+            harga_produk,
+            stok_produk
+        };
+        if (password) {
+            updateData.password = hashedPassword;
+        }
+
+        const result = await Produk.update(updateData, { where: { id_produk: id_produk } });
+
+        if (result[0]) {
+            response(200, { isSuccess: result[0] }, "Successfully updated data", res);
+        } else {
+            response(404, "User not found", "error", res);
+        }
+    } catch (error) {
+        response(500, error, "Error updating data", res);
+    }
+};
 
 exports.deleteProduk = async (req, res) => {
     try {
