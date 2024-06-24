@@ -4,7 +4,7 @@ const penjualController = require('../controllers/penjualController');
 const authenticateToken = require('../middleware/auth');
 
 // Protect routes with `authenticateToken` middleware
-router.get('/', authenticateToken, penjualController.getAllPenjual);
+router.get('/',  penjualController.getAllPenjual);
 router.get('/find', authenticateToken, penjualController.findPenjualByEmail);
 router.get('/:id_penjual', authenticateToken, penjualController.getPenjualById);
 router.post('/', authenticateToken, penjualController.createPenjual);
