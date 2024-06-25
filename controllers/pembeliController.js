@@ -101,7 +101,7 @@ exports.loginPembeli = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ id_pembeli: pembeli.id_pembeli }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id_pembeli: pembeli.id_pembeli }, process.env.JWT_SECRET, { expiresIn: '100h' });
 
         // Update user token in the database
         pembeli.token = token;
