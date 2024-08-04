@@ -6,7 +6,7 @@ const serverKey = 'Mid-server-pBJxkUUyfw1z8mladQxCagnp';
 const encodedKey = base64.encode(serverKey + ':');
 
 // Define the base URL for the Midtrans API
-const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1'; 
+const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1/invoices'; 
 
 // Create Invoice
 exports.createInvoice = async (req, res) => {
