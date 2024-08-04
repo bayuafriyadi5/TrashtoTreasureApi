@@ -83,7 +83,7 @@ exports.createInvoice = async (req, res) => {
                 "enabled_payments": ["credit_card", "gopay", "bank_transfer"], // Add the payment methods you want to enable
                 "expiry": {
                     "unit": "months",
-                    "duration": 30,
+                    "duration": 1,
                     "start_time": formatDate(start_time)
                 }
             }
