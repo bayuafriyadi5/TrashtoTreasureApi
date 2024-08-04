@@ -76,7 +76,15 @@ exports.createInvoice = async (req, res) => {
             "due_date": formatDate(due_date),
             "invoice_date": formatDate(invoice_date),
             "customer_details": customer_details,
-            "item_details": item_details
+            "item_details": item_details,
+            "payment_link": {
+                "enabled_payments": ["credit_card", "gopay", "bank_transfer"], // Add the payment methods you want to enable
+                "expiry": {
+                    "unit": "months",
+                    "duration": 1,
+                    "start_time": formatDate(invoice_date)
+                }
+            }
         };
 
         const createdInvoice = await createInvoice(data);
