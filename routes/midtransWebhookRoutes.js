@@ -10,10 +10,10 @@ router.post('/midtrans-webhook', async (req, res) => {
         console.log('Received Midtrans webhook notification:', notification);
 
         // Extract necessary details from the notification
-        const { transaction_status, midtrans_invoice_id, payment_type } = notification;
+        const { transaction_status, midtrans_invoice_id, payment_type, settlement_time, gross_amount } = notification;
 
-        // Find the transaction using invoice_id
-        const transaction = await Transaksi.findOne({ where: { midtrans_invoice_id } });
+        // Find the transaction using midtrans_invoice_id
+        const transaction = await Transaksi.findOne({ where: { invoice_id: midtrans_invoice_id } });
 
         if (transaction) {
             if (transaction_status === 'settlement') {
@@ -21,15 +21,15 @@ router.post('/midtrans-webhook', async (req, res) => {
                 await transaction.update({ status: 'paid' });
 
                 // Create a new Pembayaran record
-                if (notification.paid_at) {
+                if (settlement_time) {
                     await Pembayaran.create({
-                        waktu_pembayaran: notification.paid_at,
-                        total_bayar: notification.gross_amount,
+                        waktu_pembayaran: settlement_time,
+                        total_bayar: gross_amount,
                         metode_pembayaran: payment_type, // Assuming this field exists in the notification
                         id_transaksi: transaction.id_transaksi
                     });
                 } else {
-                    console.error('Error: paid_at field is missing or null in notification');
+                    console.error('Error: settlement_time field is missing or null in notification');
                 }
             } else if (transaction_status === 'cancelled') {
                 // Handle cancelled transactions (optional)
@@ -39,7 +39,7 @@ router.post('/midtrans-webhook', async (req, res) => {
             // Respond to Midtrans to acknowledge receipt
             res.status(200).send('Notification received');
         } else {
-            console.error('Transaction not found for invoice_id:', invoice_id);
+            console.error('Transaction not found for midtrans_invoice_id:', midtrans_invoice_id);
             res.status(404).send('Transaction not found');
         }
     } catch (error) {
@@ -49,4 +49,3 @@ router.post('/midtrans-webhook', async (req, res) => {
 });
 
 module.exports = router;
-
