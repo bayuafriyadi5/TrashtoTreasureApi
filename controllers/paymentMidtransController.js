@@ -1,5 +1,6 @@
 const axios = require('axios');
 const base64 = require('base-64');
+require('dotenv').config();
 
 // Your server key
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
