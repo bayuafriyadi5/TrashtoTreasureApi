@@ -5,7 +5,7 @@ const paymentMidtransController = require('../controllers/paymentMidtransControl
 
 router.post('/v2/invoices/', paymentController.createInvoice);
 router.get('/v2/invoices/:invoiceID', paymentController.getInvoice);
-router.get('/v1/invoices/', paymentMidtransController.createInvoice);
+router.get('/v1/invoices', paymentMidtransController.createInvoice);
 
 
 module.exports = router;
