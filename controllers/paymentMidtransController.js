@@ -72,7 +72,7 @@ exports.createInvoice = async (req, res) => {
             "payment_type": "payment_link",
             "order_id": order_id,
             "gross_amount": gross_amount,
-            "invoice_number": "123",
+            "invoice_number": invoice_number,
             "due_date": formatDate(due_date),
             "invoice_date": formatDate(invoice_date),
             "customer_details": customer_details,
@@ -98,9 +98,9 @@ exports.createInvoice = async (req, res) => {
 
 exports.getInvoice = async (req, res) => {
     try {
-        const { invoice_number } = req.params;
+        const { invoice_id } = req.params;
 
-        const fetchedInvoice = await getInvoice(invoice_number);
+        const fetchedInvoice = await getInvoice(invoice_id);
 
         res.status(200).json({
             success: true,
