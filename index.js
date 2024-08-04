@@ -9,6 +9,7 @@ const produkRoutes = require('./routes/produkRoutes');
 const transaksiRoutes = require('./routes/transaksiRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const paymentWebhookRoutes = require('./routes/paymentWebhookRoutes');
 const pembayaranRoutes = require('./routes/pembayaranRoutes');
 const protectedRoutes = require('./routes/protectedRoutes');
 
@@ -23,6 +24,7 @@ app.use('/produk', produkRoutes);
 app.use('/transaksi', transaksiRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/webhook', webhookRoutes);
+app.use('/paymentWebhook', paymentWebhookRoutes);
 app.use('/pembayaran', pembayaranRoutes);
 app.use('/protected', protectedRoutes);
 

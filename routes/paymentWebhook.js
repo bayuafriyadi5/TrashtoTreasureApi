@@ -33,7 +33,7 @@ const updateTransactionStatus = async (transaction, notification) => {
                 metode_pembayaran: notification.payment_type,
                 id_transaksi: transaction.id_transaksi
             });
-        } else if (notification.transaction_status === 'expired') {
+        } else if (notification.transaction_status === 'expire') {
             // Handle the expired invoice case
             const produk = await Produk.findOne({ where: { id_produk: transaction.id_produk } });
 
@@ -54,9 +54,13 @@ router.post('/midtrans/notification', async (req, res) => {
     try {
         const notification = req.body;
 
-        const transaction = await Transaksi.findOne({ where: { invoice_id: notification.invoice_id } });
+        // Log the incoming request for debugging
+        console.log('Midtrans Notification:', notification);
+
+        const transaction = await Transaksi.findOne({ where: { invoice_id: notification.order_id } });
 
         if (!transaction) {
+            console.error('Transaction not found for invoice_id:', notification.order_id);
             return res.status(404).json({ status: 404, message: 'Transaction not found' });
         }
 
