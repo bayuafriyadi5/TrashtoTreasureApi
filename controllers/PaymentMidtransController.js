@@ -32,7 +32,7 @@ exports.createInvoice = async (req, res) => {
             parameter,
             {
                 headers: {
-                    'Authorization': 'Basic ' + encodedKey,
+                    'Authorization': `Basic ${encodedKey}`,
                     'Content-Type': 'application/json'
                 }
             }
