@@ -14,6 +14,10 @@ router.post('/midtrans-webhook', async (req, res) => {
 
         // Find the transaction using midtrans_invoice_id
         const transaction = await Transaksi.findOne({ where: { invoice_id: midtrans_invoice_id } });
+        if (!transaction) {
+            console.error('Transaction not found for midtrans_invoice_id:', midtrans_invoice_id);
+            return res.status(404).send('Transaction not found');
+        }
 
         if (transaction) {
             if (transaction_status === 'settlement') {
