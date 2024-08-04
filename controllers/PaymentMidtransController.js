@@ -9,20 +9,23 @@ const coreApi = new midtransClient.CoreApi({
 
 // Create Invoice
 exports.createInvoice = async (req, res) => {
-    const { orderId, grossAmount, customerDetails } = req.body;
+    const { order_id, invoice_number, due_date, invoice_date, customer_details, gross_amount } = req.body;
 
     try {
         const parameter = {
             "payment_type": "bank_transfer",
             "transaction_details": {
-                "order_id": orderId,
-                "gross_amount": grossAmount
+                "order_id": order_id,
+                "gross_amount": gross_amount
             },
-            "customer_details": customerDetails,
+            "custom_field1": invoice_number,
+            "custom_field2": due_date,
+            "custom_field3": invoice_date,
+            "customer_details": customer_details,
             "item_details": [
                 {
                     "id": "item01",
-                    "price": grossAmount,
+                    "price": gross_amount,
                     "quantity": 1,
                     "name": "A product"
                 }
