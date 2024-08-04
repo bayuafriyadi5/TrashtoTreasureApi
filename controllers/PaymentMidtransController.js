@@ -1,9 +1,14 @@
 const midtransClient = require('midtrans-client');
+const base64 = require('base-64');
+
+// Your server key
+const serverKey = 'Mid-server-pBJxkUUyfw1z8mladQxCagnp';
+const encodedKey = base64.encode(serverKey + ':');
 
 // Initialize the Midtrans client
 const coreApi = new midtransClient.CoreApi({
     isProduction: false,
-    serverKey: 'Mid-server-pBJxkUUyfw1z8mladQxCagnp',
+    serverKey: serverKey,
     clientKey: 'Mid-client-cCxsOivlg7w341XQ'
 });
 
@@ -32,7 +37,13 @@ exports.createInvoice = async (req, res) => {
             ]
         };
 
-        const response = await coreApi.charge(parameter);
+        // Make the request with the Authorization header
+        const response = await coreApi.charge(parameter, {
+            headers: {
+                'Authorization': 'Basic ' + encodedKey
+            }
+        });
+
         res.json(response);
     } catch (error) {
         res.status(500).send(error);
@@ -44,7 +55,13 @@ exports.getInvoice = async (req, res) => {
     const { invoiceID } = req.params;
 
     try {
-        const response = await coreApi.transaction.status(invoiceID);
+        // Make the request with the Authorization header
+        const response = await coreApi.transaction.status(invoiceID, {
+            headers: {
+                'Authorization': 'Basic ' + encodedKey
+            }
+        });
+
         res.json(response);
     } catch (error) {
         res.status(500).send(error);
