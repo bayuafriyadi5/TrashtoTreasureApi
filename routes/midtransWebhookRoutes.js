@@ -1,14 +1,28 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const router = express.Router();
 
-const app = express();
-app.use(bodyParser.json());
-
-app.post('/midtrans-webhook', (req, res) => {
+// Handle Midtrans webhook notifications
+router.post('/midtrans-webhook', (req, res) => {
+    // Extract data from the request
     const notification = req.body;
-    // Process the notification here
-    console.log(notification);
+
+    // Process the notification data
+    console.log('Received Midtrans webhook notification:', notification);
+
+    // Example: Check the notification's transaction status
+    if (notification.transaction_status === 'settlement') {
+        // Handle the settlement
+        console.log('Transaction is settled.');
+    } else if (notification.transaction_status === 'pending') {
+        // Handle pending transactions
+        console.log('Transaction is pending.');
+    } else if (notification.transaction_status === 'cancelled') {
+        // Handle cancelled transactions
+        console.log('Transaction is cancelled.');
+    }
+
+    // Respond to Midtrans to acknowledge receipt
     res.status(200).send('Notification received');
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+module.exports = router;
