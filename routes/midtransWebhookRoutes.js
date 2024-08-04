@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Transaksi, Pembayaran } = require('../models'); // Ensure models are correctly imported
+const { Transaksi, Produk, Pembayaran } = require('../models'); // Include Pembayaran model // Ensure models are correctly imported
 
 // Handle Midtrans webhook notifications
 router.post('/midtrans-webhook', async (req, res) => {
