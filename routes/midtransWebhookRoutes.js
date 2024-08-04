@@ -10,8 +10,8 @@ router.post('/midtrans-webhook', async (req, res) => {
         // Log the entire notification payload
         console.log('Received Midtrans webhook notification:', JSON.stringify(notification, null, 2));
 
-        // Extract midtrans_invoice_id from the notification
-        const { midtrans_invoice_id } = notification;
+        // Extract midtrans_invoice_id from the notification's metadata
+        const midtrans_invoice_id = notification.metadata?.midtrans_invoice_id;
 
         // Log the midtrans_invoice_id
         console.log('Extracted midtrans_invoice_id:', midtrans_invoice_id);
