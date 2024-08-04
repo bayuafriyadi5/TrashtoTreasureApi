@@ -125,7 +125,8 @@ exports.createTransaksi = async (req, res) => {
             invoice_id,
             invoice_url,
             alamat,
-            status_pesanan: "Belum Di Bayar"
+            status_pesanan: "Belum Di Bayar",
+            order_id: "null"
         });
 
         response(200, result, "Successfully inserted data", res);
