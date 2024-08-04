@@ -2,7 +2,7 @@ const axios = require('axios');
 const base64 = require('base-64');
 
 // Your server key
-const serverKey = 'Mid-server-pBJxkUUyfw1z8mladQxCagnp';
+const serverKey = 'SB-Mid-server-RrThQqppDol0K1OGmsfzFSRJ';
 const encodedKey = base64.encode(serverKey + ':');
 
 // Define the base URL for the Midtrans API
