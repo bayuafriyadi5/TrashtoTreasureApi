@@ -1,31 +1,32 @@
 const express = require('express');
 const axios = require('axios');
-const { Transaksi, Produk, Pembayaran } = require('../models');
 const router = express.Router();
+const { Transaksi, Produk, Pembayaran } = require('../models'); // Include Pembayaran model
 
-// Midtrans API URL and credentials
-const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1/invoices'; // Use production URL for production environment
+// Midtrans API credentials
 const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
+const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1/invoices'; // Use production URL in live environment
 
-// Helper function to format date in the required format
-const formatDate = (date) => {
-    const pad = (num) => (num < 10 ? '0' : '') + num;
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
-    const offset = -date.getTimezoneOffset();
-    const sign = offset >= 0 ? '+' : '-';
-    const offsetHours = pad(Math.floor(Math.abs(offset) / 60));
-    const offsetMinutes = pad(Math.abs(offset) % 60);
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${sign}${offsetHours}${offsetMinutes}`;
+// Helper function to get invoice data from Midtrans
+const getInvoiceData = async (invoice_id) => {
+    const config = {
+        headers: {
+            'Authorization': `Basic ${Buffer.from(`${MIDTRANS_SERVER_KEY}:`).toString('base64')}`,
+        },
+    };
+
+    try {
+        const res = await axios.get(`${MIDTRANS_API_URL}/${invoice_id}`, config);
+        return res.data;
+    } catch (error) {
+        console.error('Error fetching invoice data:', error.response ? error.response.data : error.message);
+        throw new Error(error.response ? error.response.data.message : error.message);
+    }
 };
 
 // Helper function to update transaction status
-const updateTransactionStatus = async (transaction, notification) => {
-    const { transaction_status, settlement_time, gross_amount, payment_type } = notification;
+const updateTransactionStatus = async (transaction, invoiceData) => {
+    const { transaction_status, settlement_time, gross_amount, payment_type } = invoiceData;
 
     if (transaction_status === 'settlement') {
         // Update the transaction status to 'paid'
@@ -33,7 +34,7 @@ const updateTransactionStatus = async (transaction, notification) => {
 
         // Insert a new Pembayaran record
         await Pembayaran.create({
-            waktu_pembayaran: formatDate(new Date(settlement_time)),
+            waktu_pembayaran: settlement_time,
             total_bayar: gross_amount,
             metode_pembayaran: payment_type,
             id_transaksi: transaction.id_transaksi
@@ -59,29 +60,27 @@ const updateTransactionStatus = async (transaction, notification) => {
 // Webhook endpoint for Midtrans payment notifications
 router.post('/midtrans/notification', async (req, res) => {
     try {
+        // Capture the notification data sent by Midtrans
         const notification = req.body;
 
         // Log the incoming request for debugging
         console.log('Midtrans Notification:', notification);
 
-        // Validate notification signature
-        const notificationSignature = req.headers['x-signature'];
-        const validSignature = generateSignature(notification); // Implement your signature validation function
-
-        if (!validSignature) {
-            return res.status(400).json({ status: 400, message: 'Invalid signature' });
-        }
-
-        const transaction = await Transaksi.findOne({ where: { invoice_id: notification.order_id } });
+        // Fetch the transaction that corresponds to the invoice_id from the notification
+        const transaction = await Transaksi.findOne({ where: { invoice_id: notification.invoice_id } });
 
         if (!transaction) {
-            console.error('Transaction not found for invoice_id:', notification.order_id);
+            console.error('Transaction not found for invoice_id:', notification.invoice_id);
             return res.status(404).json({ status: 404, message: 'Transaction not found' });
         }
 
-        await updateTransactionStatus(transaction, notification);
+        // Fetch invoice data from Midtrans
+        const invoiceData = await getInvoiceData(notification.invoice_id);
 
-        return res.status(200).json({ status: 200, message: 'Transaction status updated successfully' });
+        // Update the transaction status based on the fetched invoice data
+        await updateTransactionStatus(transaction, invoiceData);
+
+        return res.status(200).json({ status: 200, message: 'Transaction statuses updated successfully' });
     } catch (error) {
         console.error('Error handling Midtrans webhook notification:', error);
         return res.status(500).json({ status: 500, message: 'Internal server error' });
@@ -89,10 +88,3 @@ router.post('/midtrans/notification', async (req, res) => {
 });
 
 module.exports = router;
-
-// Helper function to generate and validate signature
-const generateSignature = (notification) => {
-    // Generate and validate the signature according to Midtrans' documentation
-    // This involves creating a hash of the notification data using your server key
-    // and comparing it with the signature sent in the request headers
-};
