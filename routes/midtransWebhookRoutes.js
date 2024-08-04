@@ -10,10 +10,10 @@ router.post('/midtrans-webhook', async (req, res) => {
         console.log('Received Midtrans webhook notification:', notification);
 
         // Extract necessary details from the notification
-        const { transaction_status, invoice_id, payment_type } = notification;
+        const { transaction_status, midtrans_invoice_id, payment_type } = notification;
 
         // Find the transaction using invoice_id
-        const transaction = await Transaksi.findOne({ where: { invoice_id } });
+        const transaction = await Transaksi.findOne({ where: { midtrans_invoice_id } });
 
         if (transaction) {
             if (transaction_status === 'settlement') {
