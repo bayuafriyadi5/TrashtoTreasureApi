@@ -1,7 +1,11 @@
 const express = require('express');
 const axios = require('axios');
+const { Transaksi, Produk, Pembayaran } = require('../models');
 const router = express.Router();
-const { Transaksi, Produk, Pembayaran } = require('../models'); // Include Pembayaran model
+
+// Midtrans API URL and credentials
+const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1/invoices'; // Use production URL for production environment
+const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
 
 // Helper function to format date in the required format
 const formatDate = (date) => {
@@ -21,31 +25,34 @@ const formatDate = (date) => {
 
 // Helper function to update transaction status
 const updateTransactionStatus = async (transaction, notification) => {
-    if (transaction.status === 'pending') {
-        if (notification.transaction_status === 'settlement') {
-            // Update the transaction status to 'paid'
-            await transaction.update({ status: 'paid' });
+    const { transaction_status, settlement_time, gross_amount, payment_type } = notification;
 
-            // Insert a new Pembayaran record
-            await Pembayaran.create({
-                waktu_pembayaran: formatDate(new Date(notification.settlement_time)),
-                total_bayar: notification.gross_amount,
-                metode_pembayaran: notification.payment_type,
-                id_transaksi: transaction.id_transaksi
-            });
-        } else if (notification.transaction_status === 'expire') {
-            // Handle the expired invoice case
-            const produk = await Produk.findOne({ where: { id_produk: transaction.id_produk } });
+    if (transaction_status === 'settlement') {
+        // Update the transaction status to 'paid'
+        await transaction.update({ status: 'paid' });
 
-            if (produk) {
-                // Increase the stok_produk by the qty from the transaction
-                produk.stok_produk += transaction.qty;
-                await produk.save();
-            }
+        // Insert a new Pembayaran record
+        await Pembayaran.create({
+            waktu_pembayaran: formatDate(new Date(settlement_time)),
+            total_bayar: gross_amount,
+            metode_pembayaran: payment_type,
+            id_transaksi: transaction.id_transaksi
+        });
+    } else if (['cancel', 'deny', 'expire'].includes(transaction_status)) {
+        // Handle the failed/expired invoice case
+        const produk = await Produk.findOne({ where: { id_produk: transaction.id_produk } });
 
-            // Delete the transaction
-            await transaction.destroy();
+        if (produk) {
+            // Increase the stok_produk by the qty from the transaction
+            produk.stok_produk += transaction.qty;
+            await produk.save();
         }
+
+        // Delete the transaction
+        await transaction.destroy();
+    } else if (transaction_status === 'pending') {
+        // Update the transaction status to 'pending'
+        await transaction.update({ status: 'pending' });
     }
 };
 
@@ -56,6 +63,14 @@ router.post('/midtrans/notification', async (req, res) => {
 
         // Log the incoming request for debugging
         console.log('Midtrans Notification:', notification);
+
+        // Validate notification signature
+        const notificationSignature = req.headers['x-signature'];
+        const validSignature = generateSignature(notification); // Implement your signature validation function
+
+        if (!validSignature) {
+            return res.status(400).json({ status: 400, message: 'Invalid signature' });
+        }
 
         const transaction = await Transaksi.findOne({ where: { invoice_id: notification.order_id } });
 
@@ -74,3 +89,10 @@ router.post('/midtrans/notification', async (req, res) => {
 });
 
 module.exports = router;
+
+// Helper function to generate and validate signature
+const generateSignature = (notification) => {
+    // Generate and validate the signature according to Midtrans' documentation
+    // This involves creating a hash of the notification data using your server key
+    // and comparing it with the signature sent in the request headers
+};
