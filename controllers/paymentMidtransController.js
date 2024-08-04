@@ -67,6 +67,8 @@ exports.createInvoice = async (req, res) => {
         const invoice_number = `INV-${Date.now()}`;
         const invoice_date = new Date();
         const due_date = new Date(invoice_date.getTime() + 24 * 60 * 60 * 1000);
+        // Set start_time to a few minutes in the future
+        const start_time = new Date(invoice_date.getTime() + 5 * 60 * 1000); // 5 minutes from now
 
         const data = {
             "payment_type": "payment_link",
@@ -81,8 +83,8 @@ exports.createInvoice = async (req, res) => {
                 "enabled_payments": ["credit_card", "gopay", "bank_transfer"], // Add the payment methods you want to enable
                 "expiry": {
                     "unit": "months",
-                    "duration": 1,
-                    "start_time": formatDate(invoice_date)
+                    "duration": 30,
+                    "start_time": formatDate(start_time)
                 }
             }
         };
