@@ -80,10 +80,7 @@ exports.createInvoice = async (req, res) => {
             "customer_details": customer_details,
             "item_details": item_details,
             "payment_link": {
-                "enabled_payments": ["bca_va"],
-                "bca_va": {
-                    "number": "3372229231"
-                },
+                "enabled_payments": ["credit_card", "gopay", "bank_transfer"],
                 "expiry": {
                     "unit": "months",
                     "duration": 1,
