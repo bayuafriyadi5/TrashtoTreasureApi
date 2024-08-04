@@ -1,16 +1,12 @@
-const midtransClient = require('midtrans-client');
+const axios = require('axios');
 const base64 = require('base-64');
 
 // Your server key
 const serverKey = 'Mid-server-pBJxkUUyfw1z8mladQxCagnp';
 const encodedKey = base64.encode(serverKey + ':');
 
-// Initialize the Midtrans client
-const coreApi = new midtransClient.CoreApi({
-    isProduction: false,
-    serverKey: serverKey,
-    clientKey: 'Mid-client-cCxsOivlg7w341XQ'
-});
+// Define the base URL for the Midtrans API
+const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1'; 
 
 // Create Invoice
 exports.createInvoice = async (req, res) => {
@@ -30,14 +26,21 @@ exports.createInvoice = async (req, res) => {
             "item_details": item_details
         };
 
-        // Make the request with the Authorization header
-        const midtransResponse = await coreApi.charge(parameter, {
-            headers: {
-                'Authorization': 'Basic ' + encodedKey
+        // Make the request to Midtrans API
+        const response = await axios.post(
+            `${MIDTRANS_API_URL}/charge`,
+            parameter,
+            {
+                headers: {
+                    'Authorization': 'Basic ' + encodedKey,
+                    'Content-Type': 'application/json'
+                }
             }
-        });
+        );
 
-        const response = {
+        const midtransResponse = response.data;
+
+        const invoiceResponse = {
             "order_id": order_id,
             "invoice_number": invoice_number,
             "published_date": new Date().toISOString(),
@@ -60,9 +63,10 @@ exports.createInvoice = async (req, res) => {
             "payment_link_url": midtransResponse.redirect_url
         };
 
-        res.json(response);
+        res.json(invoiceResponse);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Error creating invoice:', error.response ? error.response.data : error.message);
+        res.status(500).send(error.response ? error.response.data : { error: 'An error occurred while creating the invoice' });
     }
 };
 
@@ -71,14 +75,19 @@ exports.getInvoice = async (req, res) => {
     const { invoiceID } = req.params;
 
     try {
-        // Make the request with the Authorization header
-        const midtransResponse = await coreApi.transaction.status(invoiceID, {
-            headers: {
-                'Authorization': 'Basic ' + encodedKey
+        // Make the request to Midtrans API
+        const response = await axios.get(
+            `${MIDTRANS_API_URL}/status/${invoiceID}`,
+            {
+                headers: {
+                    'Authorization': 'Basic ' + encodedKey
+                }
             }
-        });
+        );
 
-        const response = {
+        const midtransResponse = response.data;
+
+        const invoiceResponse = {
             "order_id": midtransResponse.order_id,
             "invoice_number": midtransResponse.custom_field1,
             "published_date": new Date().toISOString(),
@@ -101,8 +110,9 @@ exports.getInvoice = async (req, res) => {
             "payment_link_url": midtransResponse.redirect_url
         };
 
-        res.json(response);
+        res.json(invoiceResponse);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Error getting invoice:', error.response ? error.response.data : error.message);
+        res.status(500).send(error.response ? error.response.data : { error: 'An error occurred while retrieving the invoice' });
     }
 };
