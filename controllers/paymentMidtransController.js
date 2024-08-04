@@ -72,7 +72,7 @@ exports.createInvoice = async (req, res) => {
             "payment_type": "payment_link",
             "order_id": order_id,
             "gross_amount": gross_amount,
-            "invoice_number": invoice_number,
+            "invoice_number": "123",
             "due_date": formatDate(due_date),
             "invoice_date": formatDate(invoice_date),
             "customer_details": customer_details,
