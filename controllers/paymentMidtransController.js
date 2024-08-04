@@ -98,9 +98,9 @@ exports.createInvoice = async (req, res) => {
 
 exports.getInvoice = async (req, res) => {
     try {
-        const { invoiceID } = req.params;
+        const { invoice_number } = req.params;
 
-        const fetchedInvoice = await getInvoice(invoiceID);
+        const fetchedInvoice = await getInvoice(invoice_number);
 
         res.status(200).json({
             success: true,
