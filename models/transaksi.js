@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        order_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     }, {
         tableName: 'transaksi',
         timestamps: true,
