@@ -5,8 +5,8 @@ require('dotenv').config();
 
 // Midtrans API URL and credentials
 const MIDTRANS_API_URL = 'https://api.sandbox.midtrans.com/v1/invoices';
-const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
-const encodedKey = base64.encode(MIDTRANS_SERVER_KEY + ':');
+const MIDTRANS_SERVER_KEY_PROD = process.env.MIDTRANS_SERVER_KEY_PROD;
+const encodedKey = base64.encode(MIDTRANS_SERVER_KEY_PROD + ':');
 
 // Helper function to format date in the required format
 const formatDate = (date) => {
